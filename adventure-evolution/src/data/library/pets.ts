@@ -6,15 +6,25 @@ export const PETS: ContentItem[] = [
     name: "Fireling",
     type: "Pet",
     attackBoost: 3,
-    evolvesAt: 5,
-    nextEvolution: "pet_flametail",
+    evolution: {
+      requirements: [{ type: "level", level: 5 }],
+      next: "pet_flametail",
+    },
   },
   {
     id: "pet_flametail",
     name: "Flametail",
     type: "Pet",
     attackBoost: 6,
-    evolvesAt: 10,
-    nextEvolution: "pet_infernodon",
+    evolution: {
+      requirements: [{ type: "level", level: 10 }],
+      next: "pet_infernodon",
+    },
+  },
+  {
+    id: "pet_infernodon",
+    name: "Infernodon",
+    type: "Pet",
+    attackBoost: 12,
   },
 ];

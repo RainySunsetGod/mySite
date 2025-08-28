@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DEFAULT_PLAYER, type Player } from "./state/player";
-import { tryEvolve } from "./utils/evolution";
-import { getContent } from "./data/library/index";
+import { tryEvolve, type EvolutionContext } from "./utils/evolution";
+import { getContent } from "./data/library";
 import ActionMenu from "./components/ActionMenu";
 import { calculateStats } from "./utils/stats";
 
@@ -13,13 +13,21 @@ export default function App() {
     const newLevel = player.level + 1;
     const newGearView = { ...player.gearView };
 
+    // Build evolution context (later we’ll wire real inventory/merges/usage)
+    const context: EvolutionContext = {
+      level: newLevel,
+      inventory: {}, // TODO: use player.inventory
+      merges: {},    // TODO: use player.merges
+      usage: {},     // TODO: use player.usage
+    };
+
     // Evolve items in gearView
     for (const category in newGearView) {
       newGearView[category as keyof typeof newGearView] =
         newGearView[category as keyof typeof newGearView].map((id) => {
           const item = getContent(id);
           if (!item) return id;
-          return tryEvolve(item, newLevel).id;
+          return tryEvolve(item, context).id;
         });
     }
 
