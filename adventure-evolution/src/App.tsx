@@ -3,22 +3,10 @@ import { DEFAULT_PLAYER, type Player } from "./state/player";
 import { tryEvolve, type EvolutionContext } from "./utils/evolution";
 import { getContent } from "./data/library";
 import ActionMenu from "./components/ActionMenu";
-import { calculateStats } from "./utils/stats";
-import StatBar from "./components/StatBar";
+import PlayerPanel from "./components/PlayerPanel";
+import EnemyPanel from "./components/EnemyPanel";
 
-type Enemy = {
-  name: string;
-  currentHp: number;
-  currentMp: number;
-  currentSp: number;
-  maxHp: number;
-  maxMp: number;
-  maxSp: number;
-  attack: number;
-  defense: number;
-};
-
-const DEFAULT_ENEMY: Enemy = {
+const DEFAULT_ENEMY = {
   name: "Slime",
   currentHp: 40,
   currentMp: 10,
@@ -32,11 +20,9 @@ const DEFAULT_ENEMY: Enemy = {
 
 export default function App() {
   const [player, setPlayer] = useState<Player>(DEFAULT_PLAYER);
-  const [enemy, setEnemy] = useState<Enemy>(DEFAULT_ENEMY);
+  const [enemy, setEnemy] = useState(DEFAULT_ENEMY);
   // Placeholder: mark setEnemy as intentionally unused
   void setEnemy;
-
-  const stats = calculateStats(player);
 
   const levelUp = () => {
     const newLevel = player.level + 1;
@@ -62,12 +48,9 @@ export default function App() {
       ...player,
       level: newLevel,
       gearView: newGearView,
-      currentHp: stats.hp,
-      currentMp: stats.mp,
-      currentSp: stats.sp,
-      maxHp: stats.hp,
-      maxMp: stats.mp,
-      maxSp: stats.sp,
+      currentHp: player.maxHp,
+      currentMp: player.maxMp,
+      currentSp: player.maxSp,
     });
   };
 
@@ -79,45 +62,10 @@ export default function App() {
         gap: "1rem",
         padding: "1rem",
         minHeight: "100vh",
-        boxSizing: "border-box",
       }}
     >
-      {/* Left: Player */}
-      <div
-        style={{
-          border: "2px solid red",
-          padding: "1rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <h2>Player</h2>
-        <StatBar label="HP" current={player.currentHp} max={stats.hp} color="red" />
-        <StatBar label="MP" current={player.currentMp} max={stats.mp} color="blue" />
-        <StatBar label="SP" current={player.currentSp} max={stats.sp} color="green" />
+      <PlayerPanel player={player} />
 
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Core Stats</h3>
-          <p>STR: {player.stats.STR}</p>
-          <p>DEX: {player.stats.DEX}</p>
-          <p>INT: {player.stats.INT}</p>
-          <p>END: {player.stats.END}</p>
-          <p>CHA: {player.stats.CHA}</p>
-          <p>LUK: {player.stats.LUK}</p>
-        </div>
-
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Derived Stats</h3>
-          <p>Attack: {stats.attack}</p>
-          <p>Defense: {stats.defense}</p>
-          <p>Accuracy: {stats.accuracy.toFixed(1)}%</p>
-          <p>Crit Chance: {stats.critChance.toFixed(1)}%</p>
-          <p>Pet Power: {stats.petPower}</p>
-        </div>
-      </div>
-
-      {/* Middle: Actions */}
       <div
         style={{
           border: "2px solid red",
@@ -128,34 +76,18 @@ export default function App() {
         }}
       >
         <h1>Level {player.level} Adventurer</h1>
-
         <ActionMenu
           player={player}
           onUse={(item) => {
             alert(`Used ${item.name}!`);
           }}
         />
-
         <button onClick={levelUp} style={{ marginTop: "1rem" }}>
           Level Up
         </button>
       </div>
 
-      {/* Right: Enemy */}
-      <div
-        style={{
-          border: "2px solid red",
-          padding: "1rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <h2>{enemy.name}</h2>
-        <StatBar label="HP" current={enemy.currentHp} max={enemy.maxHp} color="red" />
-        <StatBar label="MP" current={enemy.currentMp} max={enemy.maxMp} color="blue" />
-        <StatBar label="SP" current={enemy.currentSp} max={enemy.maxSp} color="green" />
-      </div>
+      <EnemyPanel enemy={enemy} />
     </div>
   );
 }
