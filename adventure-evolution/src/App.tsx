@@ -4,9 +4,38 @@ import { tryEvolve, type EvolutionContext } from "./utils/evolution";
 import { getContent } from "./data/library";
 import ActionMenu from "./components/ActionMenu";
 import { calculateStats } from "./utils/stats";
+import StatBar from "./components/StatBar";
+
+type Enemy = {
+  name: string;
+  currentHp: number;
+  currentMp: number;
+  currentSp: number;
+  maxHp: number;
+  maxMp: number;
+  maxSp: number;
+  attack: number;
+  defense: number;
+};
+
+const DEFAULT_ENEMY: Enemy = {
+  name: "Slime",
+  currentHp: 40,
+  currentMp: 10,
+  currentSp: 20,
+  maxHp: 40,
+  maxMp: 10,
+  maxSp: 20,
+  attack: 5,
+  defense: 2,
+};
 
 export default function App() {
   const [player, setPlayer] = useState<Player>(DEFAULT_PLAYER);
+  const [enemy, setEnemy] = useState<Enemy>(DEFAULT_ENEMY);
+  // Placeholder: mark setEnemy as intentionally unused
+  void setEnemy;
+
   const stats = calculateStats(player);
 
   const levelUp = () => {
@@ -29,7 +58,36 @@ export default function App() {
         });
     }
 
-    setPlayer({ ...player, level: newLevel, gearView: newGearView });
+    setPlayer({
+      ...player,
+      level: newLevel,
+      gearView: newGearView,
+      // reset HP/MP/SP to new max when leveling up
+      currentHp: stats.hp,
+      currentMp: stats.mp,
+      currentSp: stats.sp,
+    });
+  };
+
+  const takeDamage = () => {
+    setPlayer((p) => ({
+      ...p,
+      currentHp: Math.max(0, p.currentHp - 10),
+    }));
+  };
+
+  const spendMana = () => {
+    setPlayer((p) => ({
+      ...p,
+      currentMp: Math.max(0, p.currentMp - 5),
+    }));
+  };
+
+  const spendStamina = () => {
+    setPlayer((p) => ({
+      ...p,
+      currentSp: Math.max(0, p.currentSp - 7),
+    }));
   };
 
   return (
@@ -49,14 +107,27 @@ export default function App() {
           border: "2px solid red",
           padding: "1rem",
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
         }}
       >
         <h2>Player</h2>
+        <StatBar label="HP" current={player.currentHp} max={stats.hp} color="red" />
+        <StatBar label="MP" current={player.currentMp} max={stats.mp} color="blue" />
+        <StatBar label="SP" current={player.currentSp} max={stats.sp} color="green" />
+
+        <button onClick={takeDamage} style={{ marginTop: "1rem" }}>
+          Take 10 Damage
+        </button>
+        <button onClick={spendMana} style={{ marginTop: "0.5rem" }}>
+          Spend 5 MP
+        </button>
+        <button onClick={spendStamina} style={{ marginTop: "0.5rem" }}>
+          Spend 7 SP
+        </button>
       </div>
 
-      {/* Center: Stats + Actions + Log */}
+      {/* Middle: Actions */}
       <div
         style={{
           border: "2px solid red",
@@ -66,28 +137,18 @@ export default function App() {
           alignItems: "center",
         }}
       >
-        {/* Top: Stats */}
-        <div style={{ marginBottom: "1rem", textAlign: "center" }}>
-          <h1>Level {player.level} Adventurer</h1>
-          <p>HP: {stats.hp}</p>
-          <p>MP: {stats.mp}</p>
-          <p>Attack: {stats.attack}</p>
-          <p>Defense: {stats.defense}</p>
-        </div>
+        <h1>Level {player.level} Adventurer</h1>
 
-        {/* Middle: Actions */}
-        <div style={{ marginBottom: "1rem" }}>
-          <h3>Actions</h3>
-          <ActionMenu
-            player={player}
-            onUse={(item) => {
-              alert(`Used ${item.name}!`);
-            }}
-          />
-          <button onClick={levelUp} style={{ marginTop: "1rem" }}>
-            Level Up
-          </button>
-        </div>
+        <ActionMenu
+          player={player}
+          onUse={(item) => {
+            alert(`Used ${item.name}!`);
+          }}
+        />
+
+        <button onClick={levelUp} style={{ marginTop: "1rem" }}>
+          Level Up
+        </button>
       </div>
 
       {/* Right: Enemy */}
@@ -96,11 +157,14 @@ export default function App() {
           border: "2px solid red",
           padding: "1rem",
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <h2>Enemy</h2>
+        <h2>{enemy.name}</h2>
+        <StatBar label="HP" current={enemy.currentHp} max={enemy.maxHp} color="red" />
+        <StatBar label="MP" current={enemy.currentMp} max={enemy.maxMp} color="blue" />
+        <StatBar label="SP" current={enemy.currentSp} max={enemy.maxSp} color="green" />
       </div>
     </div>
   );

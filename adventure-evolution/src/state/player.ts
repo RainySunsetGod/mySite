@@ -9,12 +9,19 @@ export type GearView = {
 
 export type Player = {
   level: number;
-  hp: number;
 
-  // All owned items (IDs, like "sword_iron", "misc_potion")
+  // Current values (shrink dynamically in bars)
+  currentHp: number;
+  currentMp: number;
+  currentSp: number;
+
+  // Max values (from stats calculation)
+  maxHp: number;
+  maxMp: number;
+  maxSp: number;
+
+  // Inventory system
   inventory: string[];
-
-  // Quick access loadout shown in combat
   gearView: GearView;
 
   // Tracks how many duplicates were merged into each item
@@ -23,15 +30,26 @@ export type Player = {
   // Tracks how many times each item/spell has been used
   usage: Record<string, number>;
 
-  // Tracks material quantities (like crafting mats)
+  // Tracks material quantities (crafting mats)
   materials: Record<string, number>;
 };
 
 // Example starter player
 export const DEFAULT_PLAYER: Player = {
   level: 1,
-  hp: 100,
+
+  // current values
+  currentHp: 50,
+  currentMp: 20,
+  currentSp: 30,
+
+  // max values (you can adjust these or let stats.ts calculate later)
+  maxHp: 50,
+  maxMp: 20,
+  maxSp: 30,
+
   inventory: ["sword_iron", "spell_fireball", "pet_fireling"],
+
   gearView: {
     Weapons: ["sword_iron"],
     Armor: [],
@@ -40,13 +58,8 @@ export const DEFAULT_PLAYER: Player = {
     Spells: ["spell_fireball"],
     Misc: [],
   },
-  merges: {
-    // e.g., "sword_iron": 0
-  },
-  usage: {
-    // e.g., "spell_fireball": 0
-  },
-  materials: {
-    // e.g., "misc_fire_crystal": 1
-  },
+
+  merges: {},
+  usage: {},
+  materials: {},
 };

@@ -3,23 +3,23 @@ import { getContent } from "../data/library";
 import type { ContentItem } from "../data/library/types";
 
 export type Stats = {
-  hp: number;
-  mp: number;
+  hp: number; // max HP
+  mp: number; // max MP
+  sp: number; // max SP
   attack: number;
   defense: number;
 };
 
-/**
- * Base stats at level 1 (you can tweak these as you like).
- */
 function baseStats(level: number): Stats {
   return {
     hp: 50 + level * 10,
     mp: 20 + level * 5,
+    sp: 30 + level * 5,
     attack: 5 + level * 2,
     defense: 2 + level * 2,
   };
 }
+
 
 /**
  * Compute total stats for a player, including gear bonuses.
