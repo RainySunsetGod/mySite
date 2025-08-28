@@ -1,6 +1,4 @@
 import type { Player } from "../state/player";
-import { getContent } from "../data/library";
-import type { ContentItem } from "../data/library/types";
 
 export type Stats = {
   hp: number; // max HP
@@ -8,44 +6,24 @@ export type Stats = {
   sp: number; // max SP
   attack: number;
   defense: number;
+  accuracy: number;
+  critChance: number;
+  petPower: number;
 };
 
-function baseStats(level: number): Stats {
-  return {
-    hp: 50 + level * 10,
-    mp: 20 + level * 5,
-    sp: 30 + level * 5,
-    attack: 5 + level * 2,
-    defense: 2 + level * 2,
-  };
-}
-
-
-/**
- * Compute total stats for a player, including gear bonuses.
- */
 export function calculateStats(player: Player): Stats {
-  const stats = baseStats(player.level); // ✅ const instead of let
+  const { STR, DEX, INT, END, CHA, LUK } = player.stats;
+  const { level } = player;
 
-  const applyGear = (id: string | null) => {
-    if (!id) return;
-    const item: ContentItem | undefined = getContent(id);
-    if (!item) return;
+  const hp = 50 + END * 5 + level * 2;
+  const mp = 20 + INT * 3 + level;
+  const sp = 30 + DEX * 2 + level;
 
-    if (item.attackBoost) stats.attack += item.attackBoost;
-    if (item.defenseBoost) stats.defense += item.defenseBoost;
+  const attack = STR * 2 + DEX + Math.floor(level / 2);
+  const defense = END * 2 + DEX;
+  const accuracy = 75 + DEX + LUK * 0.5;
+  const critChance = Math.min(25, LUK * 0.3); // cap at 25%
+  const petPower = CHA * 2;
 
-    // Example: pets give bonus attack
-    if (item.type === "Pet" && item.attackBoost) {
-      stats.attack += item.attackBoost;
-    }
-  };
-
-  // ✅ Use gearView instead of equipped
-  player.gearView.Weapons.forEach(applyGear);
-  player.gearView.Armor.forEach(applyGear);
-  player.gearView.Shields.forEach(applyGear);
-  player.gearView.Pet.forEach(applyGear);
-
-  return stats;
+  return { hp, mp, sp, attack, defense, accuracy, critChance, petPower };
 }

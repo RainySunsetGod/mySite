@@ -62,32 +62,13 @@ export default function App() {
       ...player,
       level: newLevel,
       gearView: newGearView,
-      // reset HP/MP/SP to new max when leveling up
       currentHp: stats.hp,
       currentMp: stats.mp,
       currentSp: stats.sp,
+      maxHp: stats.hp,
+      maxMp: stats.mp,
+      maxSp: stats.sp,
     });
-  };
-
-  const takeDamage = () => {
-    setPlayer((p) => ({
-      ...p,
-      currentHp: Math.max(0, p.currentHp - 10),
-    }));
-  };
-
-  const spendMana = () => {
-    setPlayer((p) => ({
-      ...p,
-      currentMp: Math.max(0, p.currentMp - 5),
-    }));
-  };
-
-  const spendStamina = () => {
-    setPlayer((p) => ({
-      ...p,
-      currentSp: Math.max(0, p.currentSp - 7),
-    }));
   };
 
   return (
@@ -116,15 +97,24 @@ export default function App() {
         <StatBar label="MP" current={player.currentMp} max={stats.mp} color="blue" />
         <StatBar label="SP" current={player.currentSp} max={stats.sp} color="green" />
 
-        <button onClick={takeDamage} style={{ marginTop: "1rem" }}>
-          Take 10 Damage
-        </button>
-        <button onClick={spendMana} style={{ marginTop: "0.5rem" }}>
-          Spend 5 MP
-        </button>
-        <button onClick={spendStamina} style={{ marginTop: "0.5rem" }}>
-          Spend 7 SP
-        </button>
+        <div style={{ marginTop: "1rem" }}>
+          <h3>Core Stats</h3>
+          <p>STR: {player.stats.STR}</p>
+          <p>DEX: {player.stats.DEX}</p>
+          <p>INT: {player.stats.INT}</p>
+          <p>END: {player.stats.END}</p>
+          <p>CHA: {player.stats.CHA}</p>
+          <p>LUK: {player.stats.LUK}</p>
+        </div>
+
+        <div style={{ marginTop: "1rem" }}>
+          <h3>Derived Stats</h3>
+          <p>Attack: {stats.attack}</p>
+          <p>Defense: {stats.defense}</p>
+          <p>Accuracy: {stats.accuracy.toFixed(1)}%</p>
+          <p>Crit Chance: {stats.critChance.toFixed(1)}%</p>
+          <p>Pet Power: {stats.petPower}</p>
+        </div>
       </div>
 
       {/* Middle: Actions */}

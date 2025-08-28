@@ -7,46 +7,60 @@ export type GearView = {
   Misc: string[];
 };
 
+export type CoreStats = {
+  STR: number; // Strength
+  DEX: number; // Dexterity
+  INT: number; // Intelligence
+  END: number; // Endurance
+  CHA: number; // Charisma
+  LUK: number; // Luck
+};
+
 export type Player = {
   level: number;
 
-  // Current values (shrink dynamically in bars)
+  // Current values
   currentHp: number;
   currentMp: number;
   currentSp: number;
 
-  // Max values (from stats calculation)
+  // Max values (derived from stats)
   maxHp: number;
   maxMp: number;
   maxSp: number;
+
+  // Trainable stats
+  stats: CoreStats;
 
   // Inventory system
   inventory: string[];
   gearView: GearView;
 
-  // Tracks how many duplicates were merged into each item
+  // Evolution progression
   merges: Record<string, number>;
-
-  // Tracks how many times each item/spell has been used
   usage: Record<string, number>;
-
-  // Tracks material quantities (crafting mats)
   materials: Record<string, number>;
 };
 
-// Example starter player
 export const DEFAULT_PLAYER: Player = {
   level: 1,
 
-  // current values
   currentHp: 50,
   currentMp: 20,
   currentSp: 30,
 
-  // max values (you can adjust these or let stats.ts calculate later)
   maxHp: 50,
   maxMp: 20,
   maxSp: 30,
+
+  stats: {
+    STR: 5,
+    DEX: 5,
+    INT: 5,
+    END: 5,
+    CHA: 5,
+    LUK: 5,
+  },
 
   inventory: ["sword_iron", "spell_fireball", "pet_fireling"],
 
