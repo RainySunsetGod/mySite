@@ -1,35 +1,25 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import type{ Creature } from "./data/creatures";
+import { tryEvolve } from "./utils/evolution";
+import CreatureCard from "./components/CreatureCard";
+import StarterSelect from "./components/StarterSelect";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [creature, setCreature] = useState<Creature | null>(null);
+
+  const levelUp = () => {
+    if (!creature) return;
+    const updated = { ...creature, level: creature.level + 1 };
+    setCreature(tryEvolve(updated));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ textAlign: "center", marginTop: "3rem" }}>
+      {!creature ? (
+        <StarterSelect onChoose={(c) => setCreature(c)} />
+      ) : (
+        <CreatureCard creature={creature} onLevelUp={levelUp} />
+      )}
+    </div>
+  );
 }
-
-export default App
