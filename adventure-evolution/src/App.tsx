@@ -13,12 +13,12 @@ export default function App() {
     const newLevel = player.level + 1;
     const newGearView = { ...player.gearView };
 
-    // Build evolution context (later we’ll wire real inventory/merges/usage)
+    // Build evolution context from real player state
     const context: EvolutionContext = {
       level: newLevel,
-      inventory: {}, // TODO: use player.inventory
-      merges: {},    // TODO: use player.merges
-      usage: {},     // TODO: use player.usage
+      inventory: player.materials, // materials collected
+      merges: player.merges,       // merges done
+      usage: player.usage,         // times spells/items used
     };
 
     // Evolve items in gearView
