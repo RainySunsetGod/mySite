@@ -88,20 +88,6 @@ export default function App() {
             Level Up
           </button>
         </div>
-
-        {/* Bottom: Log placeholder */}
-        <div
-          style={{
-            marginTop: "auto",
-            width: "100%",
-            border: "1px solid #333",
-            minHeight: "150px",
-            background: "#fafafa",
-          }}
-        >
-          <h4 style={{ margin: "0.5rem" }}>Combat Log</h4>
-          <p style={{ margin: "0.5rem" }}>No actions yet...</p>
-        </div>
       </div>
 
       {/* Right: Enemy */}
