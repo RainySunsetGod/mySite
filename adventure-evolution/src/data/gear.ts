@@ -5,6 +5,7 @@ export type Gear = {
   attackBoost?: number;
   defenseBoost?: number;
   special?: string; // extra flavor/effect
+  
 };
 
 export const weapons: Gear[] = [

@@ -1,83 +1,46 @@
 import { useState } from "react";
-import { weapons, armors, shields, pets, miscItems} from "../data/gear";
-import type { Gear } from "../data/gear";
+import { getContent } from "../data/library/index";
+import type { Player } from "../state/player";
+import type { ContentItem } from "../data/library/types";
 
 type Props = {
-  onAction: (message: string) => void;
-  onEquip: (gear: Gear) => void;
+    player: Player;
+    onUse: (item: ContentItem) => void;
 };
 
-export default function ActionMenu({ onAction, onEquip }: Props) {
-  const [activePanel, setActivePanel] = useState<string | null>(null);
+export default function ActionMenu({ player, onUse }: Props) {
+    const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Decide which list to show
-  let gearList: Gear[] = [];
-  if (activePanel === "Weapons") gearList = weapons;
-  if (activePanel === "Armor") gearList = armors;
-  if (activePanel === "Shields") gearList = shields;
-  if (activePanel === "Pets") gearList = pets;
-  if (activePanel === "Misc") gearList = miscItems;
+    const categories = ["Attack", "Weapons", "Armor", "Shields", "Pet", "Spells", "Misc", "Run"];
 
-  return (
-    <div style={{ display: "flex", gap: "2rem", marginTop: "1rem", justifyContent: "center" }}>
-      {/* --- Main Menu --- */}
-      <div>
-        <h3>Main Actions</h3>
-        {[
-          "Attack",
-          "Spells",
-          "Skills",
-          "Run",
-          "Weapons",
-          "Armor",
-          "Shields",
-          "Pets",
-          "Misc",
-        ].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => {
-              if (cat === "Attack") onAction("⚔️ You strike the enemy!");
-              if (cat === "Spells") onAction("🔥 You cast a fireball!");
-              if (cat === "Skills") onAction("💥 You perform a skill!");
-              if (cat === "Run") onAction("🏃 You try to run away...");
+    return (
+        <div style={{ display: "flex", gap: "2rem", marginTop: "1rem", justifyContent: "center" }}>
+            {/* Main Menu */}
+            <div>
+                <h3>Actions</h3>
+                {categories.map((cat) => (
+                    <button key={cat} onClick={() => setActiveCategory(cat)}>
+                        {cat}
+                    </button>
+                ))}
+            </div>
 
-              if (["Weapons", "Armor", "Shields", "Pets", "Misc"].includes(cat)) {
-                setActivePanel(cat);
-              }
-            }}
-            style={{ display: "block", margin: "0.25rem auto" }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* --- Sliding Side Panel --- */}
-      <div
-        className={`side-panel ${activePanel ? "open" : ""}`}
-      >
-        {activePanel && gearList.length > 0 && (
-          <div style={{ padding: "1rem" }}>
-            <h4>{activePanel}</h4>
-            {gearList.map((g) => (
-              <button
-                key={g.id}
-                onClick={() => {
-                  onEquip(g);
-                  setActivePanel(null);
-                }}
-                style={{ display: "block", margin: "0.25rem auto" }}
-              >
-                {g.name}
-              </button>
-            ))}
-            <button style={{ marginTop: "0.5rem" }} onClick={() => setActivePanel(null)}>
-              Close
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            {/* Category Panel */}
+            {activeCategory && activeCategory !== "Attack" && activeCategory !== "Run" && (
+                <div className="side-panel open" style={{ padding: "1rem", border: "1px solid gray" }}>
+                    <h4>{activeCategory}</h4>
+                    {player.gearView[activeCategory as keyof typeof player.gearView].map((id) => {
+                        const item = getContent(id);
+                        if (!item) return null;
+                        return (
+                            <button key={id} onClick={() => onUse(item)}>
+                                {item.name}
+                            </button>
+                        );
+                    })}
+                    <button onClick={() => setActiveCategory(null)}>Close</button>
+                </div>
+            )}
+        </div>
+    );
 }
