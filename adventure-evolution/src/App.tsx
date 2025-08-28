@@ -60,8 +60,8 @@ export default function App() {
         display: "grid",
         gridTemplateColumns: "1fr 2fr 1fr",
         gap: "1rem",
-        padding: "1rem",
-        minHeight: "100vh",
+        height: "100vh", // ✅ match viewport height exactly
+        boxSizing: "border-box",
       }}
     >
       <PlayerPanel player={player} />
