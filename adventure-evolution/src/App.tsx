@@ -5,14 +5,17 @@ import EnemyPanel from "./components/EnemyPanel";
 import Combat from "./modules/Combat";
 import Landing from "./modules/Landing";
 import { ENEMIES, type EnemyTemplate, type CombatEnemy } from "./data/enemies";
+import { calculateStats } from "./utils/stats";
 
 function spawnEnemy(): CombatEnemy {
   const base: EnemyTemplate = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
+  const derived = calculateStats({ level: base.level, stats: base.stats });
+
   return {
     ...base,
-    currentHp: base.maxHp,
-    currentMp: base.maxMp,
-    currentSp: base.maxSp,
+    currentHp: derived.hp,
+    currentMp: derived.mp,
+    currentSp: derived.sp,
   };
 }
 

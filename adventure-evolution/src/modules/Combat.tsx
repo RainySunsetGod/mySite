@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Player } from "../state/player";
 import type { CombatEnemy } from "../data/enemies";
 import ActionMenu from "../components/ActionMenu";
+import { calculateStats } from "../utils/stats";
 
 type Turn = "player" | "enemy";
 
@@ -24,13 +25,15 @@ export default function Combat({
   const [log, setLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
 
+  const enemyStats = calculateStats({ level: enemy.level, stats: enemy.stats });
+
   const pushLog = (msg: string) =>
     setLog((prev) => [...prev, msg].slice(-5));
 
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
-    const damage = Math.max(1, 10 - enemy.defense);
+    const damage = Math.max(1, 10 + player.level - enemyStats.defense);
     const newHp = Math.max(0, enemy.currentHp - damage);
 
     setEnemy({ ...enemy, currentHp: newHp });
@@ -49,7 +52,7 @@ export default function Combat({
   const enemyTurn = () => {
     if (battleOver) return;
 
-    const damage = Math.max(1, enemy.attack - 2);
+    const damage = Math.max(1, enemyStats.attack - 2);
     const newHp = Math.max(0, player.currentHp - damage);
 
     setPlayer({ ...player, currentHp: newHp });

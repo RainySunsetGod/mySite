@@ -1,11 +1,10 @@
+import type { CoreStats } from "../utils/stats";
+
 export type EnemyTemplate = {
   id: string;
   name: string;
-  maxHp: number;
-  maxMp: number;
-  maxSp: number;
-  attack: number;
-  defense: number;
+  level: number;
+  stats: CoreStats; // same as player
 };
 
 export type CombatEnemy = EnemyTemplate & {
@@ -18,28 +17,40 @@ export const ENEMIES: EnemyTemplate[] = [
   {
     id: "slime_green",
     name: "Green Slime",
-    maxHp: 40,
-    maxMp: 10,
-    maxSp: 20,
-    attack: 5,
-    defense: 2,
+    level: 1,
+    stats: {
+      STR: 3,
+      DEX: 2,
+      INT: 1,
+      END: 2,
+      CHA: 1,
+      LUK: 1,
+    },
   },
   {
     id: "wolf",
     name: "Hungry Wolf",
-    maxHp: 60,
-    maxMp: 15,
-    maxSp: 30,
-    attack: 8,
-    defense: 3,
+    level: 3,
+    stats: {
+      STR: 6,
+      DEX: 5,
+      INT: 1,
+      END: 4,
+      CHA: 2,
+      LUK: 2,
+    },
   },
   {
     id: "bandit",
     name: "Bandit",
-    maxHp: 80,
-    maxMp: 20,
-    maxSp: 40,
-    attack: 10,
-    defense: 5,
+    level: 5,
+    stats: {
+      STR: 8,
+      DEX: 7,
+      INT: 2,
+      END: 6,
+      CHA: 3,
+      LUK: 3,
+    },
   },
 ];
