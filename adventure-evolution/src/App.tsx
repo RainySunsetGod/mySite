@@ -4,23 +4,27 @@ import PlayerPanel from "./components/PlayerPanel";
 import EnemyPanel from "./components/EnemyPanel";
 import Combat from "./modules/Combat";
 import Landing from "./modules/Landing";
+import { ENEMIES, type EnemyTemplate, type CombatEnemy } from "./data/enemies";
 
-const DEFAULT_ENEMY = {
-  name: "Slime",
-  currentHp: 40,
-  currentMp: 10,
-  currentSp: 20,
-  maxHp: 40,
-  maxMp: 10,
-  maxSp: 20,
-  attack: 5,
-  defense: 2,
-};
+function spawnEnemy(): CombatEnemy {
+  const base: EnemyTemplate = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
+  return {
+    ...base,
+    currentHp: base.maxHp,
+    currentMp: base.maxMp,
+    currentSp: base.maxSp,
+  };
+}
 
 export default function App() {
   const [player, setPlayer] = useState<Player>(DEFAULT_PLAYER);
-  const [enemy, setEnemy] = useState(DEFAULT_ENEMY);
+  const [enemy, setEnemy] = useState<CombatEnemy>(spawnEnemy());
   const [mode, setMode] = useState<"landing" | "combat">("landing");
+
+  const enterCombat = () => {
+    setEnemy(spawnEnemy()); // new random enemy
+    setMode("combat");
+  };
 
   return (
     <div
@@ -32,7 +36,7 @@ export default function App() {
       }}
     >
       {mode === "landing" ? (
-        <Landing onEnterCombat={() => setMode("combat")} />
+        <Landing onEnterCombat={enterCombat} />
       ) : (
         <Combat
           player={player}

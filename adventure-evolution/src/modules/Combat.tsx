@@ -1,26 +1,15 @@
 import { useState } from "react";
 import type { Player } from "../state/player";
+import type { CombatEnemy } from "../data/enemies";
 import ActionMenu from "../components/ActionMenu";
-
-type Enemy = {
-  name: string;
-  currentHp: number;
-  currentMp: number;
-  currentSp: number;
-  maxHp: number;
-  maxMp: number;
-  maxSp: number;
-  attack: number;
-  defense: number;
-};
 
 type Turn = "player" | "enemy";
 
 type Props = {
   player: Player;
   setPlayer: (p: Player) => void;
-  enemy: Enemy;
-  setEnemy: (e: Enemy) => void;
+  enemy: CombatEnemy;
+  setEnemy: (e: CombatEnemy) => void;
   onExitCombat: () => void;
 };
 
