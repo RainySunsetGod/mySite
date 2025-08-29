@@ -1,18 +1,17 @@
 import { useState } from "react";
 import type { Player } from "../state/player";
-import EnemyPanel from "../components/EnemyPanel";
 import ActionMenu from "../components/ActionMenu";
 
-const DEFAULT_ENEMY = {
-  name: "Slime",
-  currentHp: 40,
-  currentMp: 10,
-  currentSp: 20,
-  maxHp: 40,
-  maxMp: 10,
-  maxSp: 20,
-  attack: 5,
-  defense: 2,
+type Enemy = {
+  name: string;
+  currentHp: number;
+  currentMp: number;
+  currentSp: number;
+  maxHp: number;
+  maxMp: number;
+  maxSp: number;
+  attack: number;
+  defense: number;
 };
 
 type Turn = "player" | "enemy";
@@ -20,11 +19,18 @@ type Turn = "player" | "enemy";
 type Props = {
   player: Player;
   setPlayer: (p: Player) => void;
+  enemy: Enemy;
+  setEnemy: (e: Enemy) => void;
   onExitCombat: () => void;
 };
 
-export default function Combat({ player, setPlayer, onExitCombat }: Props) {
-  const [enemy, setEnemy] = useState(DEFAULT_ENEMY);
+export default function Combat({
+  player,
+  setPlayer,
+  enemy,
+  setEnemy,
+  onExitCombat,
+}: Props) {
   const [turn, setTurn] = useState<Turn>("player");
   const [log, setLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
@@ -70,60 +76,56 @@ export default function Combat({ player, setPlayer, onExitCombat }: Props) {
   };
 
   return (
-    <>
-      {/* Middle panel */}
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        background: "url('/battlefield-placeholder.png') center/cover no-repeat",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingBottom: "2rem",
+      }}
+    >
+      {!battleOver && turn === "player" ? (
+        <ActionMenu
+          player={player}
+          onUse={(item) => {
+            if (item.id === "attack-basic") {
+              playerAttack();
+            } else if (item.id === "run") {
+              pushLog("You attempt to run away...");
+              setBattleOver(true);
+            } else {
+              pushLog(`You used ${item.name}, but nothing happened yet.`);
+            }
+          }}
+        />
+      ) : !battleOver ? (
+        <p style={{ background: "rgba(255,255,255,0.7)", padding: "0.5rem" }}>
+          Enemy is taking their turn...
+        </p>
+      ) : (
+        <button onClick={onExitCombat}>Return to Town</button>
+      )}
+
+      {/* Combat log */}
       <div
         style={{
-          border: "2px solid red",
-          padding: "1rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
+          marginTop: "1rem",
+          width: "80%",
+          minHeight: "5rem",
+          border: "1px solid #ccc",
+          padding: "0.5rem",
+          fontSize: "0.9rem",
+          background: "rgba(255,255,255,0.8)",
         }}
       >
-        <h1>Battle vs {enemy.name}</h1>
-
-        {!battleOver && turn === "player" ? (
-          <ActionMenu
-            player={player}
-            onUse={(item) => {
-              if (item.id === "attack-basic") {
-                playerAttack();
-              } else if (item.id === "run") {
-                pushLog("You attempt to run away...");
-                setBattleOver(true);
-              } else {
-                pushLog(`You used ${item.name}, but nothing happened yet.`);
-              }
-            }}
-          />
-        ) : !battleOver ? (
-          <p>Enemy is taking their turn...</p>
-        ) : (
-          <button onClick={onExitCombat}>Return to Town</button>
-        )}
-
-        {/* Combat log */}
-        <div
-          style={{
-            marginTop: "1rem",
-            width: "100%",
-            minHeight: "5rem",
-            border: "1px solid #ccc",
-            padding: "0.5rem",
-            fontSize: "0.9rem",
-            background: "#f8f8f8",
-          }}
-        >
-          {log.map((entry, i) => (
-            <div key={i}>{entry}</div>
-          ))}
-        </div>
+        {log.map((entry, i) => (
+          <div key={i}>{entry}</div>
+        ))}
       </div>
-
-      {/* Right panel */}
-      <EnemyPanel enemy={enemy} />
-    </>
+    </div>
   );
 }
