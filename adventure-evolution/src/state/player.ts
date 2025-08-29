@@ -17,6 +17,7 @@ export type CoreStats = {
 };
 
 export type Player = {
+  name: string;
   level: number;
 
   // Current values
@@ -43,6 +44,7 @@ export type Player = {
 };
 
 export const DEFAULT_PLAYER: Player = {
+  name: "Hero",
   level: 1,
 
   currentHp: 50,
