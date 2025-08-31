@@ -139,7 +139,7 @@ export default function Combat({
       <div
         style={{
           marginTop: "1rem",
-          width: "80%",
+          width: "50%",
           minHeight: "5rem",
           border: "1px solid #ccc",
           padding: "0.5rem",
