@@ -47,11 +47,6 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         textAlign: align,
       }}
     >
-      {/* Header */}
-      <div style={{ marginBottom: "0.5rem" }}>
-        <h2 style={{ margin: 0 }}>{entity.name}</h2>
-        <p style={{ margin: 0 }}>Level {entity.level}</p>
-      </div>
 
       {/* Toggleable/Fadeable stats */}
       <div
@@ -62,6 +57,11 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           pointerEvents: displayStats ? "auto" : "none",
         }}
       >
+        {/* Header */}
+        <div style={{ marginBottom: "0.5rem" }}>
+          <h2 style={{ margin: 0 }}>{entity.name}</h2>
+          <p style={{ margin: 0 }}>Level {entity.level}</p>
+        </div>
         <h3>Core Stats</h3>
         <p>STR: {entity.stats.STR}</p>
         <p>DEX: {entity.stats.DEX}</p>
@@ -107,12 +107,29 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
 
         {/* Bars */}
         <div style={{ width: "150px", textAlign: align }}>
-          <StatBar label="HP" current={entity.currentHp} max={derived.hp} color="red" align={side} />
-          <StatBar label="MP" current={entity.currentMp} max={derived.mp} color="blue" align={side} />
-          <StatBar label="SP" current={entity.currentSp} max={derived.sp} color="green" align={side} />
+          <h2 style={{ margin: 0 }}>{entity.name}</h2>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>HP</span>
+            <div style={{ width: "120px" }}>
+              <StatBar current={entity.currentHp} max={derived.hp} color="red" />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>MP</span>
+            <div style={{ width: "120px" }}>
+              <StatBar current={entity.currentMp} max={derived.mp} color="blue" />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>SP</span>
+            <div style={{ width: "120px" }}>
+              <StatBar current={entity.currentSp} max={derived.sp} color="green" />
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
