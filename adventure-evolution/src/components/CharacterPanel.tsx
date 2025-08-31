@@ -28,9 +28,12 @@ type Props = {
 
 export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const [showStats, setShowStats] = useState(false);
-  const derived = calculateStats({ level: entity.level, stats: entity.stats });
+  const [isHovering, setIsHovering] = useState(false);
 
+  const derived = calculateStats({ level: entity.level, stats: entity.stats });
   const align = side === "left" ? "left" : "right";
+
+  const displayStats = showStats || isHovering;
 
   return (
     <div
@@ -50,27 +53,32 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <p style={{ margin: 0 }}>Level {entity.level}</p>
       </div>
 
-      {/* Toggleable stats */}
-      {showStats && (
-        <div style={{ marginBottom: "1rem" }}>
-          <h3>Core Stats</h3>
-          <p>STR: {entity.stats.STR}</p>
-          <p>DEX: {entity.stats.DEX}</p>
-          <p>INT: {entity.stats.INT}</p>
-          <p>END: {entity.stats.END}</p>
-          <p>CHA: {entity.stats.CHA}</p>
-          <p>LUK: {entity.stats.LUK}</p>
+      {/* Toggleable/Fadeable stats */}
+      <div
+        style={{
+          marginBottom: "1rem",
+          opacity: displayStats ? (showStats ? 1 : 0.8) : 0,
+          transition: "opacity 0.6s ease",
+          pointerEvents: displayStats ? "auto" : "none",
+        }}
+      >
+        <h3>Core Stats</h3>
+        <p>STR: {entity.stats.STR}</p>
+        <p>DEX: {entity.stats.DEX}</p>
+        <p>INT: {entity.stats.INT}</p>
+        <p>END: {entity.stats.END}</p>
+        <p>CHA: {entity.stats.CHA}</p>
+        <p>LUK: {entity.stats.LUK}</p>
 
-          <h3>Derived Stats</h3>
-          <p>Attack: {derived.attack}</p>
-          <p>Defense: {derived.defense}</p>
-          <p>Accuracy: {derived.accuracy.toFixed(1)}%</p>
-          <p>Crit: {derived.critChance.toFixed(1)}%</p>
-          <p>Pet Power: {derived.petPower}</p>
-        </div>
-      )}
+        <h3>Derived Stats</h3>
+        <p>Attack: {derived.attack}</p>
+        <p>Defense: {derived.defense}</p>
+        <p>Accuracy: {derived.accuracy.toFixed(1)}%</p>
+        <p>Crit: {derived.critChance.toFixed(1)}%</p>
+        <p>Pet Power: {derived.petPower}</p>
+      </div>
 
-      {/* Bars + portrait */}
+      {/* Portrait + Bars (switched) */}
       <div
         style={{
           display: "flex",
@@ -80,34 +88,11 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           marginTop: "auto",
         }}
       >
-        {/* Bars */}
-        <div style={{ width: "150px", textAlign: align }}>
-          <StatBar
-            label="HP"
-            current={entity.currentHp}
-            max={derived.hp}
-            color="red"
-            align={side}
-          />
-          <StatBar
-            label="MP"
-            current={entity.currentMp}
-            max={derived.mp}
-            color="blue"
-            align={side}
-          />
-          <StatBar
-            label="SP"
-            current={entity.currentSp}
-            max={derived.sp}
-            color="green"
-            align={side}
-          />
-        </div>
-
         {/* Portrait */}
         <div
           onClick={() => setShowStats((prev) => !prev)}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
           title="Click to toggle stats"
           style={{
             width: "100px",
@@ -119,7 +104,15 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
             flexShrink: 0,
           }}
         />
+
+        {/* Bars */}
+        <div style={{ width: "150px", textAlign: align }}>
+          <StatBar label="HP" current={entity.currentHp} max={derived.hp} color="red" align={side} />
+          <StatBar label="MP" current={entity.currentMp} max={derived.mp} color="blue" align={side} />
+          <StatBar label="SP" current={entity.currentSp} max={derived.sp} color="green" align={side} />
+        </div>
       </div>
+
     </div>
   );
 }
