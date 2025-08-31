@@ -2,15 +2,18 @@ import { useState } from "react";
 import type { Player } from "../state/player";
 import type { CombatEnemy } from "../data/enemies";
 import ActionMenu from "../components/ActionMenu";
-import { calculateStats } from "../utils/stats";
+import {
+  calculateStats,
+  calculateDamageOutcome,
+} from "../utils/stats";
 
 type Turn = "player" | "enemy";
 
 type Props = {
   player: Player;
-  setPlayer: React.Dispatch<React.SetStateAction<Player>>; // ✅ proper setter type
+  setPlayer: React.Dispatch<React.SetStateAction<Player>>;
   enemy: CombatEnemy;
-  setEnemy: React.Dispatch<React.SetStateAction<CombatEnemy>>; // ✅ same for enemy
+  setEnemy: React.Dispatch<React.SetStateAction<CombatEnemy>>;
   onExitCombat: () => void;
 };
 
@@ -24,9 +27,6 @@ export default function Combat({
   const [turn, setTurn] = useState<Turn>("player");
   const [log, setLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
-
-  const enemyStats = calculateStats({ level: enemy.level, stats: enemy.stats });
-  const playerStats = calculateStats({ level: player.level, stats: player.stats });
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
 
@@ -50,13 +50,23 @@ export default function Combat({
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
-    const damage = Math.max(1, playerStats.attack - enemyStats.defense);
-    const newEnemyHp = Math.max(0, enemy.currentHp - damage);
+    const outcome = calculateDamageOutcome(
+      { stats: player.stats, level: player.level },
+      { stats: enemy.stats, level: enemy.level },
+      "melee" // Replace with dynamic type later
+    );
 
-    setEnemy((prev) => ({ ...prev, currentHp: newEnemyHp }));
-    pushLog(`You attack the ${enemy.name} for ${damage} damage!`);
+    if (!outcome.hit) {
+      pushLog(`You missed the ${enemy.name}!`);
+    } else {
+      setEnemy((prev) => ({
+        ...prev,
+        currentHp: Math.max(0, prev.currentHp - outcome.damage),
+      }));
+      pushLog(`You hit the ${enemy.name} for ${outcome.damage} damage!`);
+    }
 
-    if (newEnemyHp <= 0) {
+    if (enemy.currentHp - outcome.damage <= 0) {
       pushLog(`You defeated the ${enemy.name}!`);
       setBattleOver(true);
       return;
@@ -69,21 +79,29 @@ export default function Combat({
   const enemyTurn = () => {
     if (battleOver) return;
 
-    const damage = Math.max(1, enemyStats.attack - playerStats.defense);
-    const newHp = Math.max(0, player.currentHp - damage);
+    const outcome = calculateDamageOutcome(
+      { stats: enemy.stats, level: enemy.level },
+      { stats: player.stats, level: player.level },
+      "melee" // Replace with enemy's attack type later
+    );
 
-    setPlayer((prev) => ({ ...prev, currentHp: newHp }));
-    pushLog(`${enemy.name} hits you for ${damage} damage!`);
+    if (!outcome.hit) {
+      pushLog(`${enemy.name} missed!`);
+    } else {
+      setPlayer((prev) => ({
+        ...prev,
+        currentHp: Math.max(0, prev.currentHp - outcome.damage),
+      }));
+      pushLog(`${enemy.name} hits you for ${outcome.damage} damage!`);
+    }
 
-    if (newHp <= 0) {
+    if (player.currentHp - outcome.damage <= 0) {
       pushLog(`You were defeated by the ${enemy.name}...`);
       setBattleOver(true);
       return;
     }
 
-    // 🔹 End of round: regen after both acted
     regenSp();
-
     setTurn("player");
   };
 

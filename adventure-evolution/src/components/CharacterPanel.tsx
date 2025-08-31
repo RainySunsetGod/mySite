@@ -23,7 +23,7 @@ type Entity = {
 type Props = {
   entity: Entity;
   portraitUrl: string;
-  side: "left" | "right"; // changes alignment
+  side: "left" | "right";
 };
 
 export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
@@ -47,7 +47,6 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         textAlign: align,
       }}
     >
-
       {/* Toggleable/Fadeable stats */}
       <div
         style={{
@@ -57,11 +56,16 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           pointerEvents: displayStats ? "auto" : "none",
         }}
       >
-        {/* Header */}
         <div style={{ marginBottom: "0.5rem" }}>
           <h2 style={{ margin: 0 }}>{entity.name}</h2>
           <p style={{ margin: 0 }}>Level {entity.level}</p>
         </div>
+
+        <h3>Combat Defense</h3>
+        <p>Melee Defense: {entity.stats.END}</p>
+        <p>Ranged Defense: {Math.floor((entity.stats.DEX + entity.stats.END) / 2)}</p>
+        <p>Magic Defense: {Math.floor((entity.stats.INT + entity.stats.END) / 2)}</p>
+        
         <h3>Core Stats</h3>
         <p>STR: {entity.stats.STR}</p>
         <p>DEX: {entity.stats.DEX}</p>
@@ -69,16 +73,9 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <p>END: {entity.stats.END}</p>
         <p>CHA: {entity.stats.CHA}</p>
         <p>LUK: {entity.stats.LUK}</p>
-
-        <h3>Derived Stats</h3>
-        <p>Attack: {derived.attack}</p>
-        <p>Defense: {derived.defense}</p>
-        <p>Accuracy: {derived.accuracy.toFixed(1)}%</p>
-        <p>Crit: {derived.critChance.toFixed(1)}%</p>
-        <p>Pet Power: {derived.petPower}</p>
       </div>
 
-      {/* Portrait + Bars (switched) */}
+      {/* Portrait + Bars */}
       <div
         style={{
           display: "flex",
@@ -108,6 +105,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         {/* Bars */}
         <div style={{ width: "150px", textAlign: align }}>
           <h2 style={{ margin: 0 }}>{entity.name}</h2>
+
           <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>HP</span>
             <div style={{ width: "120px" }}>
