@@ -53,7 +53,7 @@ export default function Combat({
     const outcome = calculateDamageOutcome(
       { stats: player.stats, level: player.level },
       { stats: enemy.stats, level: enemy.level },
-      "melee" // Replace with dynamic type later
+      "melee" // Later: dynamically choose based on equipped weapon
     );
 
     if (!outcome.hit) {
@@ -63,11 +63,18 @@ export default function Combat({
         ...prev,
         currentHp: Math.max(0, prev.currentHp - outcome.damage),
       }));
-      pushLog(`You hit the ${enemy.name} for ${outcome.damage} damage!`);
+
+      if (outcome.wasCrit) {
+        pushLog(`💥 Critical hit! You dealt ${outcome.damage} damage!`);
+      } else {
+        pushLog(`You hit the ${enemy.name} for ${outcome.damage} damage.`);
+      }
     }
 
+    pushLog(`🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (you rolled ${outcome.roll.toFixed(1)})`);
+
     if (enemy.currentHp - outcome.damage <= 0) {
-      pushLog(`You defeated the ${enemy.name}!`);
+      pushLog(`✅ You defeated the ${enemy.name}!`);
       setBattleOver(true);
       return;
     }
@@ -82,7 +89,7 @@ export default function Combat({
     const outcome = calculateDamageOutcome(
       { stats: enemy.stats, level: enemy.level },
       { stats: player.stats, level: player.level },
-      "melee" // Replace with enemy's attack type later
+      "melee"
     );
 
     if (!outcome.hit) {
@@ -92,11 +99,18 @@ export default function Combat({
         ...prev,
         currentHp: Math.max(0, prev.currentHp - outcome.damage),
       }));
-      pushLog(`${enemy.name} hits you for ${outcome.damage} damage!`);
+
+      if (outcome.wasCrit) {
+        pushLog(`❗ ${enemy.name} critically hits you for ${outcome.damage} damage!`);
+      } else {
+        pushLog(`${enemy.name} hits you for ${outcome.damage} damage.`);
+      }
     }
 
+    pushLog(`🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+
     if (player.currentHp - outcome.damage <= 0) {
-      pushLog(`You were defeated by the ${enemy.name}...`);
+      pushLog(`💀 You were defeated by the ${enemy.name}...`);
       setBattleOver(true);
       return;
     }

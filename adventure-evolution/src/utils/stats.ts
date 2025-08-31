@@ -69,21 +69,36 @@ export function calculateDamageOutcome(
   attacker: { stats: CoreStats; level: number },
   defender: { stats: CoreStats; level: number },
   type: AttackType
-): { hit: boolean; damage: number } {
+): {
+  hit: boolean;
+  damage: number;
+  wasCrit: boolean;
+  hitChance: number;
+  roll: number;
+} {
   const { stats: atkStats, level: atkLevel } = attacker;
   const { stats: defStats, level: defLevel } = defender;
 
   const mainStat = getMainStatForType(type, atkStats);
   const accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
-  const resistance =
-    getResistanceByType(type, defStats) * 2 + defStats.LUK + defLevel;
+  const defenseStat = getResistanceByType(type, defStats);
+  const resistance = defenseStat * 2 + defStats.LUK + defLevel;
 
   const hitChance = accuracy - resistance + 50;
   const roll = Math.random() * 100;
   const hit = roll <= hitChance;
 
-  if (!hit) return { hit: false, damage: 0 };
+  if (!hit) {
+    return {
+      hit: false,
+      damage: 0,
+      wasCrit: false,
+      hitChance,
+      roll,
+    };
+  }
 
+  // Base damage
   let baseDamage = 0;
   switch (type) {
     case "melee":
@@ -97,8 +112,24 @@ export function calculateDamageOutcome(
       break;
   }
 
-  const mitigation = defStats.END * 0.75;
-  const finalDamage = Math.max(1, Math.round(baseDamage - mitigation));
+  // Critical check
+  const critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
+  const critRoll = Math.random() * 100;
+  const wasCrit = critRoll < critChance;
 
-  return { hit: true, damage: finalDamage };
+  let damage = baseDamage;
+  if (wasCrit) {
+    damage *= 1.5; // crit multiplier
+  }
+
+  const mitigation = defStats.END * 0.75;
+  const finalDamage = Math.max(1, Math.round(damage - mitigation));
+
+  return {
+    hit: true,
+    damage: finalDamage,
+    wasCrit,
+    hitChance,
+    roll,
+  };
 }
