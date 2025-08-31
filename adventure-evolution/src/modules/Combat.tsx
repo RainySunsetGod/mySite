@@ -26,20 +26,32 @@ export default function Combat({
   const [battleOver, setBattleOver] = useState(false);
 
   const enemyStats = calculateStats({ level: enemy.level, stats: enemy.stats });
+  const playerStats = calculateStats({ level: player.level, stats: player.stats });
+
+  const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
 
   const pushLog = (msg: string) =>
     setLog((prev) => [...prev, msg].slice(-5));
 
+  const regenSp = () => {
+    const spRegen = 2 + Math.floor(player.stats.END / 5);
+    const newSp = Math.min(player.currentSp + spRegen, playerStats.sp);
+    if (newSp !== player.currentSp) {
+      setPlayer({ ...player, currentSp: newSp });
+      pushLog(`You regained ${newSp - player.currentSp} SP.`);
+    }
+  };
+
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
-    const damage = Math.max(1, 10 + player.level - enemyStats.defense);
-    const newHp = Math.max(0, enemy.currentHp - damage);
+    const damage = Math.max(1, playerStats.attack - enemyStats.defense);
+    const newEnemyHp = Math.max(0, enemy.currentHp - damage);
 
-    setEnemy({ ...enemy, currentHp: newHp });
+    setEnemy({ ...enemy, currentHp: newEnemyHp });
     pushLog(`You attack the ${enemy.name} for ${damage} damage!`);
 
-    if (newHp <= 0) {
+    if (newEnemyHp <= 0) {
       pushLog(`You defeated the ${enemy.name}!`);
       setBattleOver(true);
       return;
@@ -52,7 +64,7 @@ export default function Combat({
   const enemyTurn = () => {
     if (battleOver) return;
 
-    const damage = Math.max(1, enemyStats.attack - 2);
+    const damage = Math.max(1, enemyStats.attack - playerStats.defense);
     const newHp = Math.max(0, player.currentHp - damage);
 
     setPlayer({ ...player, currentHp: newHp });
@@ -64,7 +76,23 @@ export default function Combat({
       return;
     }
 
+    // 🔹 End of round: regenerate SP AFTER both acted
+    regenSp();
+
     setTurn("player");
+  };
+
+  const handleRun = () => {
+    if (player.currentSp < runCost) {
+      pushLog(
+        `Not enough SP to run! Need ${runCost}, you have ${player.currentSp}.`
+      );
+      return;
+    }
+
+    setPlayer({ ...player, currentSp: player.currentSp - runCost });
+    pushLog(`You spend ${runCost} SP and escape from battle!`);
+    setBattleOver(true);
   };
 
   return (
@@ -83,12 +111,12 @@ export default function Combat({
       {!battleOver && turn === "player" ? (
         <ActionMenu
           player={player}
+          runCost={runCost}
           onUse={(item) => {
             if (item.id === "attack-basic") {
               playerAttack();
             } else if (item.id === "run") {
-              pushLog("You attempt to run away...");
-              setBattleOver(true);
+              handleRun();
             } else {
               pushLog(`You used ${item.name}, but nothing happened yet.`);
             }

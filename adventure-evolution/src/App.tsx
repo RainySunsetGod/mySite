@@ -25,8 +25,8 @@ export default function App() {
   const [mode, setMode] = useState<"landing" | "combat">("landing");
 
   const enterCombat = () => {
-    setEnemy(spawnEnemy()); // new random enemy
-    setMode("combat");
+    setEnemy(spawnEnemy()); // enemy starts fresh
+    setMode("combat"); // ✅ player keeps current HP/MP/SP
   };
 
   return (
