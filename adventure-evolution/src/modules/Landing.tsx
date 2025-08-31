@@ -1,36 +1,36 @@
+import type { Player } from "../state/player";
+import { fullHeal, saveProgress } from "../utils/game";
+
 type Props = {
+  player: Player;
+  setPlayer: (p: Player) => void;
   onEnterCombat: () => void;
+  onEnterShop: () => void;
 };
 
-export default function Landing({ onEnterCombat }: Props) {
+export default function Landing({ player, setPlayer, onEnterCombat, onEnterShop }: Props) {
+  const handleHeal = () => {
+    const healed = fullHeal(player);
+    setPlayer(healed);
+    saveProgress(healed);
+    alert("You rested at the inn. Fully healed!");
+  };
+
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "url('/town-bg.png') center/cover no-repeat", // ✅ background image
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          background: "rgba(255, 255, 255, 0.8)",
-          padding: "1rem 2rem",
-          border: "2px solid black",
-          borderRadius: "8px",
-        }}
-      >
-        <h1>🏰 Town Square</h1>
-        <p>Welcome, adventurer! What will you do?</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "1rem" }}>
-          <button onClick={onEnterCombat}>⚔️ Battle Monsters</button>
-          <button>🛒 Visit Shop</button>
-          <button>💪 Train Stats</button>
-          <button>🛏️ Rest at Inn</button>
-        </div>
-      </div>
+    <div style={{ textAlign: "center", paddingTop: "2rem" }}>
+      <h2>Welcome to Town</h2>
+
+      <button onClick={handleHeal} style={{ margin: "0.5rem" }}>
+        Rest at Inn
+      </button>
+
+      <button onClick={onEnterShop} style={{ margin: "0.5rem" }}>
+        Visit Shop
+      </button>
+
+      <button onClick={onEnterCombat} style={{ margin: "0.5rem" }}>
+        Go Adventuring
+      </button>
     </div>
   );
 }

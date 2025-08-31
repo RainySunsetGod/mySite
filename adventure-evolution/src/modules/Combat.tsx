@@ -8,9 +8,9 @@ type Turn = "player" | "enemy";
 
 type Props = {
   player: Player;
-  setPlayer: (p: Player) => void;
+  setPlayer: React.Dispatch<React.SetStateAction<Player>>; // ✅ proper setter type
   enemy: CombatEnemy;
-  setEnemy: (e: CombatEnemy) => void;
+  setEnemy: React.Dispatch<React.SetStateAction<CombatEnemy>>; // ✅ same for enemy
   onExitCombat: () => void;
 };
 
@@ -34,12 +34,17 @@ export default function Combat({
     setLog((prev) => [...prev, msg].slice(-5));
 
   const regenSp = () => {
-    const spRegen = 2 + Math.floor(player.stats.END / 5);
-    const newSp = Math.min(player.currentSp + spRegen, playerStats.sp);
-    if (newSp !== player.currentSp) {
-      setPlayer({ ...player, currentSp: newSp });
-      pushLog(`You regained ${newSp - player.currentSp} SP.`);
-    }
+    setPlayer((prev) => {
+      const spRegen = 2 + Math.floor(prev.stats.END / 5);
+      const maxSp = calculateStats(prev).sp;
+      const newSp = Math.min(prev.currentSp + spRegen, maxSp);
+
+      if (newSp !== prev.currentSp) {
+        pushLog(`You regained ${newSp - prev.currentSp} SP.`);
+        return { ...prev, currentSp: newSp };
+      }
+      return prev;
+    });
   };
 
   const playerAttack = () => {
@@ -48,7 +53,7 @@ export default function Combat({
     const damage = Math.max(1, playerStats.attack - enemyStats.defense);
     const newEnemyHp = Math.max(0, enemy.currentHp - damage);
 
-    setEnemy({ ...enemy, currentHp: newEnemyHp });
+    setEnemy((prev) => ({ ...prev, currentHp: newEnemyHp }));
     pushLog(`You attack the ${enemy.name} for ${damage} damage!`);
 
     if (newEnemyHp <= 0) {
@@ -67,7 +72,7 @@ export default function Combat({
     const damage = Math.max(1, enemyStats.attack - playerStats.defense);
     const newHp = Math.max(0, player.currentHp - damage);
 
-    setPlayer({ ...player, currentHp: newHp });
+    setPlayer((prev) => ({ ...prev, currentHp: newHp }));
     pushLog(`${enemy.name} hits you for ${damage} damage!`);
 
     if (newHp <= 0) {
@@ -76,7 +81,7 @@ export default function Combat({
       return;
     }
 
-    // 🔹 End of round: regenerate SP AFTER both acted
+    // 🔹 End of round: regen after both acted
     regenSp();
 
     setTurn("player");
@@ -90,7 +95,7 @@ export default function Combat({
       return;
     }
 
-    setPlayer({ ...player, currentSp: player.currentSp - runCost });
+    setPlayer((prev) => ({ ...prev, currentSp: prev.currentSp - runCost }));
     pushLog(`You spend ${runCost} SP and escape from battle!`);
     setBattleOver(true);
   };

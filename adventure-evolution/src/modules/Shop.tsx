@@ -1,5 +1,6 @@
 import { getContent } from "../data/library";
 import type { Player } from "../state/player";
+import { saveProgress } from "../utils/game";
 
 type Props = {
   player: Player;
@@ -15,7 +16,9 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
       alert("You already own this item!");
       return;
     }
-    setPlayer({ ...player, inventory: [...player.inventory, id] });
+    const updated = { ...player, inventory: [...player.inventory, id] };
+    setPlayer(updated);
+    saveProgress(updated);
     alert(`Bought ${getContent(id)?.name}!`);
   };
 

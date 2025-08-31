@@ -7,16 +7,14 @@ export function fullHeal(player: Player): Player {
     ...player,
     currentHp: stats.hp,
     currentMp: stats.mp,
-    // ❌ Do not reset SP here (keeps stamina economy intact)
+    // 🔹 SP NOT reset, stamina is an economy
   };
 }
 
-// Save player to localStorage
 export function saveProgress(player: Player) {
   localStorage.setItem("playerData", JSON.stringify(player));
 }
 
-// Load player from localStorage
 export function loadProgress(): Player | null {
   const data = localStorage.getItem("playerData");
   if (!data) return null;
