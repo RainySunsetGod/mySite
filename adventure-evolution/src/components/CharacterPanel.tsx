@@ -62,10 +62,11 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         </div>
 
         <h3>Combat Defense</h3>
-        <p>Melee Defense: {entity.stats.END}</p>
-        <p>Ranged Defense: {Math.floor((entity.stats.DEX + entity.stats.END) / 2)}</p>
-        <p>Magic Defense: {Math.floor((entity.stats.INT + entity.stats.END) / 2)}</p>
-        
+        <p>Melee Defense: {entity.stats.STR}</p>
+        <p>Ranged Defense: {entity.stats.DEX}</p>
+        <p>Magic Defense: {entity.stats.INT}</p>
+
+
         <h3>Core Stats</h3>
         <p>STR: {entity.stats.STR}</p>
         <p>DEX: {entity.stats.DEX}</p>

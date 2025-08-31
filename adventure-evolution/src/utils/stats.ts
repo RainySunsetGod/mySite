@@ -57,11 +57,11 @@ function getMainStatForType(type: AttackType, stats: CoreStats): number {
 function getResistanceByType(type: AttackType, stats: CoreStats): number {
   switch (type) {
     case "melee":
-      return stats.END;
+      return stats.STR;
     case "ranged":
-      return Math.floor((stats.DEX + stats.END) / 2);
+      return stats.DEX;
     case "magic":
-      return Math.floor((stats.INT + stats.END) / 2);
+      return stats.INT;
   }
 }
 
