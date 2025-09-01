@@ -114,9 +114,11 @@ export default function App() {
       {mode === "inventory" && (
         <InventoryScreen
           player={player}
+          setPlayer={saveAndSetPlayer} // ✅ REQUIRED
           onClose={() => setMode("landing")}
         />
       )}
+
 
       {/* Overlay Panels */}
       {mode !== "creation" && (
