@@ -27,9 +27,9 @@ export function calculateStats(entity: { level: number; stats: CoreStats }): Der
   const mp = 20 + INT * 5 + entity.level * 2;
   const sp = 30 + DEX * 3 + entity.level * 2;
 
-  const meleeAttack = STR * 1.5 + entity.level;
+  const meleeAttack = STR * 2 + entity.level;
   const rangedAttack = DEX * 1.5 + entity.level;
-  const magicAttack = INT * 1.5 + entity.level;
+  const magicAttack = INT * 1.2 + entity.level;
 
   const critChance = LUK * 0.5 + DEX * 0.2;
   const petPower = CHA * 2;

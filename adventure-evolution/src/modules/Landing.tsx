@@ -6,9 +6,18 @@ type Props = {
   setPlayer: (p: Player) => void;
   onEnterCombat: () => void;
   onEnterShop: () => void;
+  onEnterTrainer: () => void;
+  onEnterInventory: () => void; // ✅ NEW
 };
 
-export default function Landing({ player, setPlayer, onEnterCombat, onEnterShop }: Props) {
+export default function Landing({
+  player,
+  setPlayer,
+  onEnterCombat,
+  onEnterShop,
+  onEnterTrainer,
+  onEnterInventory, // ✅ NEW
+}: Props) {
   const handleHeal = () => {
     const healed = fullHeal(player);
     setPlayer(healed);
@@ -28,8 +37,16 @@ export default function Landing({ player, setPlayer, onEnterCombat, onEnterShop 
         Visit Shop
       </button>
 
+      <button onClick={onEnterTrainer} style={{ margin: "0.5rem" }}>
+        Visit Stat Trainer
+      </button>
+
       <button onClick={onEnterCombat} style={{ margin: "0.5rem" }}>
         Go Adventuring
+      </button>
+
+      <button onClick={onEnterInventory} style={{ margin: "0.5rem" }}>
+        View Inventory
       </button>
     </div>
   );

@@ -6,6 +6,9 @@ import Combat from "./modules/Combat";
 import Landing from "./modules/Landing";
 import Shop from "./modules/Shop";
 import CharacterCreation from "./modules/CharacterCreation";
+import StatTrainer from "./modules/StatTrainer";
+import InventoryScreen from "./components/Inventory"; // ✅ NEW
+
 import { ENEMIES, type EnemyTemplate, type CombatEnemy } from "./data/enemies";
 import { calculateStats } from "./utils/stats";
 import { loadProgress, saveProgress } from "./utils/game";
@@ -31,10 +34,9 @@ export default function App() {
   );
   const [enemy, setEnemy] = useState<CombatEnemy>(spawnEnemy());
   const [mode, setMode] = useState<
-    "creation" | "landing" | "combat" | "shop"
+    "creation" | "landing" | "combat" | "shop" | "trainer" | "inventory"
   >(loadProgress() ? "landing" : "creation");
 
-  // ✅ custom setter that works with functional updates AND auto-saves
   const saveAndSetPlayer: React.Dispatch<React.SetStateAction<Player>> = (
     update
   ) => {
@@ -69,23 +71,28 @@ export default function App() {
       }}
     >
       {mode === "creation" && <CharacterCreation onCreate={handleCreate} />}
+
       {mode === "landing" && (
         <Landing
           player={player}
           setPlayer={saveAndSetPlayer}
           onEnterCombat={enterCombat}
           onEnterShop={() => setMode("shop")}
+          onEnterTrainer={() => setMode("trainer")}
+          onEnterInventory={() => setMode("inventory")} // ✅ added
         />
       )}
+
       {mode === "combat" && (
         <Combat
           player={player}
-          setPlayer={saveAndSetPlayer} // ✅ fixed
+          setPlayer={saveAndSetPlayer}
           enemy={enemy}
           setEnemy={setEnemy}
           onExitCombat={() => setMode("landing")}
         />
       )}
+
       {mode === "shop" && (
         <Shop
           player={player}
@@ -93,6 +100,21 @@ export default function App() {
           shopName="Weapon Shop"
           stock={WEAPON_SHOP}
           onExit={() => setMode("landing")}
+        />
+      )}
+
+      {mode === "trainer" && (
+        <StatTrainer
+          player={player}
+          setPlayer={saveAndSetPlayer}
+          onExit={() => setMode("landing")}
+        />
+      )}
+
+      {mode === "inventory" && (
+        <InventoryScreen
+          player={player}
+          onClose={() => setMode("landing")}
         />
       )}
 

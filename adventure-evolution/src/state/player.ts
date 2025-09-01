@@ -32,6 +32,7 @@ export type Player = {
 
   // Trainable stats
   stats: CoreStats;
+  unspentPoints: number; // NEW: Track points awaiting allocation
 
   // Inventory system
   inventory: string[];
@@ -42,6 +43,7 @@ export type Player = {
   usage: Record<string, number>;
   materials: Record<string, number>;
 };
+
 
 export const DEFAULT_PLAYER: Player = {
   name: "Hero",
@@ -56,13 +58,15 @@ export const DEFAULT_PLAYER: Player = {
   maxSp: 30,
 
   stats: {
-    STR: 5,
-    DEX: 5,
-    INT: 5,
-    END: 5,
-    CHA: 5,
-    LUK: 5,
+    STR: 0,
+    DEX: 0,
+    INT: 0,
+    END: 0,
+    CHA: 0,
+    LUK: 0,
   },
+
+  unspentPoints: 5, // NEW: Based on level
 
   inventory: ["sword_iron", "spell_fireball", "pet_fireling"],
 
@@ -79,3 +83,39 @@ export const DEFAULT_PLAYER: Player = {
   usage: {},
   materials: {},
 };
+
+export function allocatePlayerStats(
+  player: Player,
+  allocation: Partial<CoreStats>
+): Player {
+  const pointsToSpend = Object.values(allocation).reduce((sum, val) => sum + (val || 0), 0);
+
+  if (pointsToSpend > player.unspentPoints) {
+    throw new Error(`Trying to spend ${pointsToSpend}, but only ${player.unspentPoints} available`);
+  }
+
+  const updatedStats: CoreStats = {
+    STR: player.stats.STR + (allocation.STR || 0),
+    DEX: player.stats.DEX + (allocation.DEX || 0),
+    INT: player.stats.INT + (allocation.INT || 0),
+    END: player.stats.END + (allocation.END || 0),
+    CHA: player.stats.CHA + (allocation.CHA || 0),
+    LUK: player.stats.LUK + (allocation.LUK || 0),
+  };
+
+  return {
+    ...player,
+    stats: updatedStats,
+    unspentPoints: player.unspentPoints - pointsToSpend,
+  };
+}
+
+export function levelUp(player: Player): Player {
+  const newLevel = player.level + 1;
+
+  return {
+    ...player,
+    level: newLevel,
+    unspentPoints: player.unspentPoints + 5,
+  };
+}

@@ -1,3 +1,5 @@
+import type { CoreStats } from "../../state/player"; // Make sure this import is valid
+
 export type ContentType = "Weapon" | "Armor" | "Shield" | "Pet" | "Spell" | "Misc";
 
 export type EvolutionRequirement =
@@ -10,6 +12,8 @@ export type ContentItem = {
   id: string;
   name: string;
   type: ContentType;
+
+  // Existing fields
   attackBoost?: number;
   defenseBoost?: number;
   cost?: number;        // for spells
@@ -18,6 +22,11 @@ export type ContentItem = {
   special?: string;
   evolution?: {
     requirements: EvolutionRequirement[];
-    next: string; // id of evolved form
+    next: string;
   };
+
+  // ✅ NEW fields (optional, won’t break existing items)
+  statModifiers?: Partial<CoreStats>; // e.g. { STR: 2, END: 1 }
+  skills?: string[];                  // e.g. ["slash", "bash"]
+  tags?: string[];                    // e.g. ["starter", "class"]
 };
