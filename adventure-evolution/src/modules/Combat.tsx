@@ -6,6 +6,7 @@ import {
   calculateStats,
   calculateDamageOutcome,
 } from "../utils/stats";
+import { getTop8ByCategory } from "../utils/inventory"; // ✅ NEW helper
 
 type Turn = "player" | "enemy";
 
@@ -29,6 +30,9 @@ export default function Combat({
   const [battleOver, setBattleOver] = useState(false);
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
+
+  // ✅ Trim inventory to top 8 per category
+  const top8 = getTop8ByCategory(player);
 
   const pushLog = (msg: string) =>
     setLog((prev) => [...prev, msg].slice(-5));
@@ -71,7 +75,9 @@ export default function Combat({
       }
     }
 
-    pushLog(`🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (you rolled ${outcome.roll.toFixed(1)})`);
+    pushLog(
+      `🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (you rolled ${outcome.roll.toFixed(1)})`
+    );
 
     if (enemy.currentHp - outcome.damage <= 0) {
       pushLog(`✅ You defeated the ${enemy.name}!`);
@@ -107,7 +113,9 @@ export default function Combat({
       }
     }
 
-    pushLog(`🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+    pushLog(
+      `🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
+    );
 
     if (player.currentHp - outcome.damage <= 0) {
       pushLog(`💀 You were defeated by the ${enemy.name}...`);
@@ -147,8 +155,8 @@ export default function Combat({
     >
       {!battleOver && turn === "player" ? (
         <ActionMenu
-          player={player}
           runCost={runCost}
+          top8={top8} // ✅ pass trimmed slots into ActionMenu
           onUse={(item) => {
             if (item.id === "attack-basic") {
               playerAttack();
