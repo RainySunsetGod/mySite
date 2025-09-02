@@ -29,9 +29,19 @@ function spawnEnemy(): CombatEnemy {
 }
 
 export default function App() {
-  const [player, setPlayer] = useState<Player>(
-    loadProgress() ?? DEFAULT_PLAYER
-  );
+  const [player, setPlayer] = useState<Player>(() => {
+    const saved = loadProgress();
+    if (saved) {
+      return {
+        ...saved,
+        currentHp: saved.maxHp, // always heal HP
+        currentMp: saved.maxMp, // always heal MP
+        currentSp: 0,           // reset SP
+      };
+    }
+    return DEFAULT_PLAYER;
+  });
+
   const [enemy, setEnemy] = useState<CombatEnemy>(spawnEnemy());
   const [mode, setMode] = useState<
     "creation" | "landing" | "combat" | "shop" | "trainer" | "inventory"
