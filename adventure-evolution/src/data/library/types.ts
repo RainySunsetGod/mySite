@@ -2,6 +2,12 @@ import type { CoreStats } from "../../state/player"; // Make sure this import is
 
 export type ContentType = "Weapon" | "Armor" | "Shield" | "Pet" | "Spell" | "Misc";
 
+export type Skill = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
 export type EvolutionRequirement =
   | { type: "level"; level: number }
   | { type: "merge"; count: number }
@@ -27,6 +33,6 @@ export type ContentItem = {
 
   // ✅ NEW fields (optional, won’t break existing items)
   statModifiers?: Partial<CoreStats>; // e.g. { STR: 2, END: 1 }
-  skills?: string[];                  // e.g. ["slash", "bash"]
+  skills?: Skill[];                  // e.g. ["slash", "bash"]
   tags?: string[];                    // e.g. ["starter", "class"]
 };

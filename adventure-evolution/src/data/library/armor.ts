@@ -13,6 +13,10 @@ export const ARMORS: ContentItem[] = [
         type: "Armor",
         defenseBoost: 1,
         special: "Reduce spell cost",
+        skills: [
+            { id: "mage-blast", name: "Arcane Blast", description: "Deal INT-based damage" },
+            { id: "mana-shield", name: "Mana Shield", description: "Reduce damage for 3 turns" },
+        ],
     },
 
     // ✅ Starting class armors:
@@ -22,7 +26,7 @@ export const ARMORS: ContentItem[] = [
         type: "Armor",
         defenseBoost: 5,
         statModifiers: { STR: 2, END: 1 },
-        skills: ["slash"],
+        skills: [],
         tags: ["starter", "class"],
     },
     {
@@ -31,7 +35,7 @@ export const ARMORS: ContentItem[] = [
         type: "Armor",
         defenseBoost: 3,
         statModifiers: { DEX: 2, LUK: 1 },
-        skills: ["backstab"],
+        skills: [],
         tags: ["starter", "class"],
     },
     {
@@ -40,7 +44,7 @@ export const ARMORS: ContentItem[] = [
         type: "Armor",
         defenseBoost: 2,
         statModifiers: { INT: 3 },
-        skills: ["fireball"],
+        skills: [],
         tags: ["starter", "class"],
     },
     {
@@ -49,7 +53,7 @@ export const ARMORS: ContentItem[] = [
         type: "Armor",
         defenseBoost: 2,
         statModifiers: { CHA: 2, STR: 1 },
-        skills: ["pet_rally"],
+        skills: [],
         tags: ["starter", "class"],
     },
 ];

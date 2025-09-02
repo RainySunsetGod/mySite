@@ -155,8 +155,11 @@ export default function Combat({
     >
       {!battleOver && turn === "player" ? (
         <ActionMenu
+          player={player}
           runCost={runCost}
           top8={top8} // ✅ pass trimmed slots into ActionMenu
+          equippedArmorId={player.gearView.Armor[0] ?? null}
+          onEquip={(updated) => setPlayer(updated)}
           onUse={(item) => {
             if (item.id === "attack-basic") {
               playerAttack();
