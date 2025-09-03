@@ -22,7 +22,6 @@ type Entity = {
   maxSp: number;
 };
 
-
 type Props = {
   entity: Entity;
   portraitUrl: string;
@@ -33,9 +32,8 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const [showStats, setShowStats] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
-  const align = side === "left" ? "left" : "right";
-
   const displayStats = showStats || isHovering;
+  const isLeft = side === "left";
 
   return (
     <div
@@ -46,16 +44,16 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
-        textAlign: align,
       }}
     >
-      {/* Toggleable/Fadeable stats */}
+      {/* Toggleable/Fadeable stats (always same orientation) */}
       <div
         style={{
           marginBottom: "1rem",
           opacity: displayStats ? (showStats ? 1 : 0.8) : 0,
           transition: "opacity 0.6s ease",
           pointerEvents: displayStats ? "auto" : "none",
+          textAlign: "left",
         }}
       >
         <div style={{ marginBottom: "0.5rem" }}>
@@ -68,7 +66,6 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <p>Ranged Defense: {entity.stats.DEX}</p>
         <p>Magic Defense: {entity.stats.INT}</p>
 
-
         <h3>Core Stats</h3>
         <p>STR: {entity.stats.STR}</p>
         <p>DEX: {entity.stats.DEX}</p>
@@ -78,12 +75,13 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <p>LUK: {entity.stats.LUK}</p>
       </div>
 
-      {/* Portrait + Bars */}
+      {/* Portrait + Bars (mirrored based on side) */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: side === "left" ? "flex-start" : "flex-end",
+          justifyContent: isLeft ? "flex-start" : "flex-end",
+          flexDirection: isLeft ? "row" : "row-reverse",
           gap: "1rem",
           marginTop: "auto",
         }}
@@ -105,28 +103,31 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           }}
         />
 
-        {/* Bars */}
-        <div style={{ width: "150px", textAlign: align }}>
-          <h2 style={{ margin: 0 }}>{entity.name}</h2>
+        {/* Bars (mirror fill direction too) */}
+        <div style={{ flex: 1, minWidth: "180px", textAlign: "center" }}>
+          <h2 style={{ margin: "0 0 0.5rem 0" }}>{entity.name}</h2>
 
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+          {/* HP */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>HP</span>
-            <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentHp} max={entity.maxHp} color="red" />
+            <div style={{ flex: 1 }}>
+              <StatBar current={entity.currentHp} max={entity.maxHp} color="red" align={isLeft ? "left" : "right"} />
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+          {/* MP */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>MP</span>
-            <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentMp} max={entity.maxMp} color="blue" />
+            <div style={{ flex: 1 }}>
+              <StatBar current={entity.currentMp} max={entity.maxMp} color="blue" align={isLeft ? "left" : "right"} />
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
+          {/* SP */}
+          <div style={{ display: "flex", alignItems: "center" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>SP</span>
-            <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentSp} max={entity.maxSp} color="green" />
+            <div style={{ flex: 1 }}>
+              <StatBar current={entity.currentSp} max={entity.maxSp} color="green" align={isLeft ? "left" : "right"} />
             </div>
           </div>
         </div>

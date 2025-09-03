@@ -6,16 +6,17 @@ type Props = {
 };
 
 export default function StatBar({ current, max, color, align = "left" }: Props) {
-  const percentage = (current / max) * 100;
+  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
 
   return (
     <div
       style={{
-        height: "16px",
-        background: "#ccc",
+        height: "18px",
+        background: "#333", // darker background so text is always visible
         position: "relative",
         overflow: "hidden",
         borderRadius: "4px",
+        border: "1px solid #000",
       }}
     >
       {/* Filled portion */}
@@ -33,20 +34,25 @@ export default function StatBar({ current, max, color, align = "left" }: Props) 
       />
 
       {/* Value text */}
-      <span
+      <div
         style={{
           position: "absolute",
+          top: 0,
+          left: 0,
           width: "100%",
-          textAlign: "center",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           fontSize: "0.75rem",
-          lineHeight: "16px",
-          color: "white",
-          textShadow: "0 0 2px black",
+          fontWeight: "bold",
+          color: "#fff",
+          textShadow: "0 0 3px #000, 0 0 5px #000",
           pointerEvents: "none",
         }}
       >
         {current} / {max}
-      </span>
+      </div>
     </div>
   );
 }
