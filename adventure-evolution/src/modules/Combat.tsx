@@ -6,7 +6,8 @@ import {
   calculateStats,
   calculateDamageOutcome,
 } from "../utils/stats";
-import { getTop8ByCategory } from "../utils/inventory"; // ✅ NEW helper
+import { getTop8ByCategory } from "../utils/inventory";
+import { getContent } from "../data/library";
 
 type Turn = "player" | "enemy";
 
@@ -54,10 +55,15 @@ export default function Combat({
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
+    // ✅ Look up equipped weapon
+    const weaponId = player.gearView.Weapons[0];
+    const weapon = weaponId ? getContent(weaponId) : null;
+    const attackType = weapon?.attackType ?? "melee"; // default to melee
+
     const outcome = calculateDamageOutcome(
       { stats: player.stats, level: player.level },
       { stats: enemy.stats, level: enemy.level },
-      "melee" // Later: dynamically choose based on equipped weapon
+      attackType
     );
 
     if (!outcome.hit) {

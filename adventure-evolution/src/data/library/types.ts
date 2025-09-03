@@ -30,7 +30,8 @@ export type ContentItem = {
     requirements: EvolutionRequirement[];
     next: string;
   };
-
+  attackType?: "melee" | "ranged" | "magic";
+  
   // ✅ NEW fields (optional, won’t break existing items)
   statModifiers?: Partial<CoreStats>; // e.g. { STR: 2, END: 1 }
   skills?: Skill[];                  // e.g. ["slash", "bash"]
