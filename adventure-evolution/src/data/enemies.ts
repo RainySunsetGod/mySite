@@ -11,7 +11,11 @@ export type CombatEnemy = EnemyTemplate & {
   currentHp: number;
   currentMp: number;
   currentSp: number;
+  maxHp: number;
+  maxMp: number;
+  maxSp: number;
 };
+
 
 export const ENEMIES: EnemyTemplate[] = [
   {

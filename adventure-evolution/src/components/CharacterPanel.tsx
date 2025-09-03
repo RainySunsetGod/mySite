@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { calculateStats } from "../utils/stats";
 import StatBar from "./StatBar";
 
 type CoreStats = {
@@ -18,7 +17,11 @@ type Entity = {
   currentHp: number;
   currentMp: number;
   currentSp: number;
+  maxHp: number;
+  maxMp: number;
+  maxSp: number;
 };
+
 
 type Props = {
   entity: Entity;
@@ -30,7 +33,6 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const [showStats, setShowStats] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
-  const derived = calculateStats({ level: entity.level, stats: entity.stats });
   const align = side === "left" ? "left" : "right";
 
   const displayStats = showStats || isHovering;
@@ -110,21 +112,21 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>HP</span>
             <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentHp} max={derived.hp} color="red" />
+              <StatBar current={entity.currentHp} max={entity.maxHp} color="red" />
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>MP</span>
             <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentMp} max={derived.mp} color="blue" />
+              <StatBar current={entity.currentMp} max={entity.maxMp} color="blue" />
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem", width: "150px" }}>
             <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>SP</span>
             <div style={{ width: "120px" }}>
-              <StatBar current={entity.currentSp} max={derived.sp} color="green" />
+              <StatBar current={entity.currentSp} max={entity.maxSp} color="green" />
             </div>
           </div>
         </div>

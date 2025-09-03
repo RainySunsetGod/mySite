@@ -25,8 +25,12 @@ function spawnEnemy(): CombatEnemy {
     currentHp: derived.hp,
     currentMp: derived.mp,
     currentSp: derived.sp,
+    maxHp: derived.hp,
+    maxMp: derived.mp,
+    maxSp: derived.sp,
   };
 }
+
 
 export default function App() {
   const [player, setPlayer] = useState<Player>(() => {
