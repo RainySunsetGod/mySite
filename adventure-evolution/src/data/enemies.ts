@@ -1,10 +1,12 @@
 import type { CoreStats } from "../utils/stats";
+import type { Element } from "../modules/elements";
 
 export type EnemyTemplate = {
   id: string;
   name: string;
   level: number;
   stats: CoreStats; // same as player
+  resistances?: Partial<Record<Element, number>>;
 };
 
 export type CombatEnemy = EnemyTemplate & {
@@ -43,6 +45,7 @@ export const ENEMIES: EnemyTemplate[] = [
       CHA: 2,
       LUK: 2,
     },
+    resistances: { Fire: 150, Ice: 80 },
   },
   {
     id: "bandit",
