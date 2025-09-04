@@ -13,6 +13,9 @@ export default function ItemDetails({ item }: { item: ContentItem | null }) {
   return (
     <div
       style={{
+        position: "absolute", // ✅ overlay, not inline
+        top: "1rem",
+        right: "1rem",
         width: "300px",
         border: "2px solid #444",
         borderRadius: "6px",
@@ -20,6 +23,7 @@ export default function ItemDetails({ item }: { item: ContentItem | null }) {
         padding: "1rem",
         color: "white",
         textAlign: "left",
+        zIndex: 1000, // ✅ ensures it’s above everything else
       }}
     >
       <h3>{item.name}</h3>
@@ -54,7 +58,8 @@ export default function ItemDetails({ item }: { item: ContentItem | null }) {
         {item.resistances &&
           Object.entries(item.resistances).map(([el, val]) => (
             <li key={el}>
-              🛡️ {ELEMENT_DETAILS[el as keyof typeof ELEMENT_DETAILS].label}: {val}%
+              🛡️ {ELEMENT_DETAILS[el as keyof typeof ELEMENT_DETAILS].label}:{" "}
+              {val}%
             </li>
           ))}
 
