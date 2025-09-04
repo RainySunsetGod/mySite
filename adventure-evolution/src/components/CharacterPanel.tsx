@@ -21,7 +21,9 @@ type Entity = {
   maxHp: number;
   maxMp: number;
   maxSp: number;
-  resistances?: Partial<Record<Element, number>>; // ✅ NEW optional
+  gold: number;
+  experience: number;
+  resistances?: Partial<Record<Element, number>>;
 };
 
 type Props = {
@@ -66,6 +68,8 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <div style={{ marginBottom: "0.5rem" }}>
           <h2 style={{ margin: 0 }}>{entity.name}</h2>
           <p style={{ margin: 0 }}>Level {entity.level}</p>
+          <p style={{ margin: 0 }}>Gold: {entity.gold || 0}</p>
+          <p style={{ margin: 0 }}>Experience: {entity.experience || 0} / {entity.experience || 0}</p>
         </div>
 
         <h3>Combat Defense</h3>

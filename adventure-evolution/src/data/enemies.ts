@@ -5,6 +5,8 @@ export type EnemyTemplate = {
   id: string;
   name: string;
   level: number;
+  gold?: number;
+  experience?: number;
   stats: CoreStats; // same as player
   resistances?: Partial<Record<Element, number>>;
 };
@@ -24,6 +26,8 @@ export const ENEMIES: EnemyTemplate[] = [
     id: "slime_green",
     name: "Green Slime",
     level: 1,
+    gold: 5,
+    experience: 10,
     stats: {
       STR: 3,
       DEX: 2,
