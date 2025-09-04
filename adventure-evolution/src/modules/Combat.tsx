@@ -2,12 +2,10 @@ import { useState } from "react";
 import type { Player } from "../state/player";
 import type { CombatEnemy } from "../data/enemies";
 import ActionMenu from "../components/ActionMenu";
-import {
-  calculateStats,
-  calculateDamageOutcome,
-} from "../utils/stats";
+import { calculateStats, calculateDamageOutcome } from "../utils/stats";
 import { getTop8ByCategory } from "../utils/inventory";
 import { getContent } from "../data/library";
+import type { ContentItem } from "../data/library/types";
 
 type Turn = "player" | "enemy";
 
@@ -32,11 +30,10 @@ export default function Combat({
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
 
-  // ✅ Trim inventory to top 8 per category
   const top8 = getTop8ByCategory(player);
 
   const pushLog = (msg: string) =>
-    setLog((prev) => [...prev, msg].slice(-5));
+    setLog((prev) => [...prev, msg].slice(-10)); // keep last 10
 
   const regenSp = () => {
     setPlayer((prev) => {
@@ -55,15 +52,16 @@ export default function Combat({
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
-    // ✅ Look up equipped weapon
-    const weaponId = player.gearView.Weapons[0];
-    const weapon = weaponId ? getContent(weaponId) : null;
-    const attackType = weapon?.attackType ?? "melee"; // default to melee
+    // ✅ Determine equipped weapon
+    const weaponId = player.gearView.Weapons?.[0] ?? null;
+    const playerWeapon: ContentItem | null = weaponId
+      ? getContent(weaponId) || null
+      : null;
 
     const outcome = calculateDamageOutcome(
-      { stats: player.stats, level: player.level },
+      { stats: player.stats, level: player.level, weapon: playerWeapon ?? undefined },
       { stats: enemy.stats, level: enemy.level },
-      attackType
+      playerWeapon?.attackType ?? "melee"
     );
 
     if (!outcome.hit) {
@@ -81,9 +79,11 @@ export default function Combat({
       }
     }
 
-    pushLog(
-      `🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (you rolled ${outcome.roll.toFixed(1)})`
-    );
+    pushLog(`🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+    if (playerWeapon) {
+      pushLog(`⚔️ Weapon: ${playerWeapon.name}`);
+    }
+    outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
 
     if (enemy.currentHp - outcome.damage <= 0) {
       pushLog(`✅ You defeated the ${enemy.name}!`);
@@ -119,9 +119,8 @@ export default function Combat({
       }
     }
 
-    pushLog(
-      `🎯 Hit chance was ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
-    );
+    pushLog(`🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+    outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
 
     if (player.currentHp - outcome.damage <= 0) {
       pushLog(`💀 You were defeated by the ${enemy.name}...`);
@@ -163,7 +162,7 @@ export default function Combat({
         <ActionMenu
           player={player}
           runCost={runCost}
-          top8={top8} // ✅ pass trimmed slots into ActionMenu
+          top8={top8}
           equippedArmorId={player.gearView.Armor[0] ?? null}
           onEquip={(updated) => setPlayer(updated)}
           onUse={(item) => {

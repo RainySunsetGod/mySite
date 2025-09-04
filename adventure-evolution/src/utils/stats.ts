@@ -1,3 +1,6 @@
+// utils/stats.ts
+import type { ContentItem } from "../data/library/types";
+
 export type AttackType = "melee" | "ranged" | "magic";
 
 export type CoreStats = {
@@ -62,30 +65,32 @@ function getResistanceByType(type: AttackType, stats: CoreStats): number {
   }
 }
 
-import type { Element } from "../modules/elements";
-
 export function calculateDamageOutcome(
-  attacker: { stats: CoreStats; level: number },
-  defender: {
-    stats: CoreStats;
-    level: number;
-    resistances?: Partial<Record<Element, number>>;
-  },
-  type: AttackType,
-  element: Element = "Neutral" as Element
+  attacker: { stats: CoreStats; level: number; weapon?: ContentItem },
+  defender: { stats: CoreStats; level: number },
+  type: AttackType
 ): {
   hit: boolean;
   damage: number;
   wasCrit: boolean;
   hitChance: number;
   roll: number;
+  debug: string[];
 } {
-  const { stats: atkStats, level: atkLevel } = attacker;
-  const { stats: defStats, level: defLevel, resistances = {} } = defender;
+  const { stats: atkStats, level: atkLevel, weapon } = attacker;
+  const { stats: defStats, level: defLevel } = defender;
 
-  // Accuracy
+  const debug: string[] = [];
+
+  // === Accuracy Calculation ===
   const mainStat = getMainStatForType(type, atkStats);
-  const accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
+  let accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
+
+  if (weapon?.accuracy !== undefined) {
+    accuracy += weapon.accuracy; // ✅ Apply weapon bonus
+    debug.push(`Weapon accuracy bonus applied: +${weapon.accuracy}`);
+  }
+
   const defenseStat = getResistanceByType(type, defStats);
   const resistance = defenseStat * 2 + defStats.LUK + defLevel;
 
@@ -93,31 +98,68 @@ export function calculateDamageOutcome(
   const roll = Math.random() * 100;
   const hit = roll <= hitChance;
 
+  debug.push(`Final hit chance: ${hitChance.toFixed(1)}%, roll: ${roll.toFixed(1)}`);
+
   if (!hit) {
-    return { hit: false, damage: 0, wasCrit: false, hitChance, roll };
+    return {
+      hit: false,
+      damage: 0,
+      wasCrit: false,
+      hitChance,
+      roll,
+      debug,
+    };
   }
 
-  // Base damage
+  // === Damage Calculation ===
   let baseDamage = 0;
-  switch (type) {
-    case "melee": baseDamage = atkStats.STR * 1.5 + atkLevel; break;
-    case "ranged": baseDamage = atkStats.DEX * 1.5 + atkLevel; break;
-    case "magic": baseDamage = atkStats.INT * 1.5 + atkLevel; break;
+  if (weapon?.damage) {
+    const min = weapon.damage.min;
+    const max = weapon.damage.max;
+    baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
+    debug.push(`Rolled weapon damage: ${baseDamage} (${min}-${max})`);
+  } else {
+    switch (type) {
+      case "melee":
+        baseDamage = atkStats.STR * 1.5 + atkLevel;
+        break;
+      case "ranged":
+        baseDamage = atkStats.DEX * 1.5 + atkLevel;
+        break;
+      case "magic":
+        baseDamage = atkStats.INT * 1.5 + atkLevel;
+        break;
+    }
+    debug.push(`Base stat damage: ${baseDamage}`);
   }
 
-  // Critical
-  const critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
+  // === Critical Check ===
+  let critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
+  if (weapon?.critBonus !== undefined) {
+    critChance += weapon.critBonus; // ✅ Apply weapon crit bonus
+    debug.push(`Weapon crit bonus applied: +${weapon.critBonus}`);
+  }
+
   const critRoll = Math.random() * 100;
   const wasCrit = critRoll < critChance;
 
-  let damage = baseDamage;
-  if (wasCrit) damage *= 1.5;
+  if (wasCrit) {
+    baseDamage = Math.floor(baseDamage * 1.5);
+    debug.push(`Critical hit! Roll: ${critRoll.toFixed(1)} < ${critChance.toFixed(1)}`);
+  } else {
+    debug.push(`No crit. Roll: ${critRoll.toFixed(1)} vs ${critChance.toFixed(1)}`);
+  }
 
-  // Apply elemental resistances
-  const resistPercent = resistances[element] ?? 0;
-  const reducedDamage = damage * (1 - resistPercent / 100);
+  const finalDamage = Math.max(1, Math.round(baseDamage));
 
-  const finalDamage = Math.max(1, Math.round(reducedDamage));
+  debug.push(`Final damage dealt: ${finalDamage}`);
 
-  return { hit: true, damage: finalDamage, wasCrit, hitChance, roll };
+  return {
+    hit: true,
+    damage: finalDamage,
+    wasCrit,
+    hitChance,
+    roll,
+    debug,
+  };
 }

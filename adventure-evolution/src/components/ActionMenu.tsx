@@ -207,7 +207,7 @@ export default function ActionMenu({
             position: "absolute",
             left: "230%", // ✅ moves panel away from menu
             top: 0,
-            width: "300px",
+            width: "350px",
             zIndex: 10,
           }}
         >

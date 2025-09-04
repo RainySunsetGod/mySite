@@ -1,13 +1,7 @@
 import type { CoreStats } from "../../state/player";
 import type { Element } from "../../modules/elements";
 
-export type ContentType =
-  | "Weapon"
-  | "Armor"
-  | "Shield"
-  | "Pet"
-  | "Spell"
-  | "Misc";
+export type ContentType = "Weapon" | "Armor" | "Shield" | "Pet" | "Spell" | "Misc";
 
 export type Skill = {
   id: string;
@@ -21,35 +15,37 @@ export type EvolutionRequirement =
   | { type: "material"; itemId: string; amount: number }
   | { type: "usage"; uses: number };
 
+export type DamageRange = {
+  min: number;
+  max: number;
+};
+
 export type ContentItem = {
   id: string;
   name: string;
   type: ContentType;
 
-  description?: string;
+  // Existing fields
+  attackBoost?: number;
+  defenseBoost?: number;
+  cost?: number;        // for spells
+  description?: string; // for spells/misc
+  power?: number;       // spells: positive = damage, negative = healing
   special?: string;
-
   evolution?: {
     requirements: EvolutionRequirement[];
     next: string;
   };
-
-  // Offensive gear
   attackType?: "melee" | "ranged" | "magic";
-  element?: Element;
-  damage?: { min: number; max: number }; // ✅ Weapon/spell damage range
-  accuracy?: number;  // bonus hit chance %
-  critBonus?: number; // bonus crit chance %
 
-  // Defensive gear
+  // ✅ NEW fields
+  element?: Element; // e.g. "Fire" sword, "Ice" spell
   resistances?: Partial<Record<Element, number>>; // e.g. { Fire: 90, Ice: 110 }
+  damage?: DamageRange; // weapons: {min, max}
+  accuracy?: number; // flat accuracy bonus %
+  critBonus?: number; // flat crit chance bonus %
 
-  // Spells
-  power?: number; // positive = damage, negative = healing
-  cost?: number;  // MP cost
-
-  // Other
-  statModifiers?: Partial<CoreStats>;
-  skills?: Skill[];
-  tags?: string[];
+  statModifiers?: Partial<CoreStats>; // e.g. { STR: 2, END: 1 }
+  skills?: Skill[];                   // e.g. ["slash", "bash"]
+  tags?: string[];                    // e.g. ["starter", "class"]
 };
