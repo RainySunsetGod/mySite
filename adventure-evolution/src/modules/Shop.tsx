@@ -3,6 +3,7 @@ import { getContent } from "../data/library";
 import type { Player } from "../state/player";
 import type { ContentType, ContentItem } from "../data/library/types";
 import { saveProgress } from "../utils/game";
+import ItemDetails from "../components/ItemDetails"; // ✅ new shared component
 
 type Props = {
   player: Player;
@@ -150,41 +151,7 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
       </div>
 
       {/* Right: Item Details */}
-      {selectedItem && (
-        <div
-          style={{
-            width: "300px",
-            border: "2px solid #444",
-            borderRadius: "6px",
-            backgroundColor: "#222",
-            padding: "1rem",
-            color: "white",
-            textAlign: "left",
-          }}
-        >
-          <h3>{selectedItem.name}</h3>
-          {selectedItem.description && (
-            <p style={{ fontStyle: "italic" }}>{selectedItem.description}</p>
-          )}
-          <ul style={{ listStyle: "none", padding: 0, fontSize: "0.85rem" }}>
-            {selectedItem.attackBoost !== undefined && (
-              <li>⚔️ Attack: +{selectedItem.attackBoost}</li>
-            )}
-            {selectedItem.defenseBoost !== undefined && (
-              <li>🛡️ Defense: +{selectedItem.defenseBoost}</li>
-            )}
-            {selectedItem.power !== undefined && (
-              <li>
-                {selectedItem.power > 0
-                  ? `🔥 Power: ${selectedItem.power} damage`
-                  : `✨ Healing: ${Math.abs(selectedItem.power)}`}
-              </li>
-            )}
-            {selectedItem.cost !== undefined && <li>🔹 Cost: {selectedItem.cost} MP</li>}
-            {selectedItem.special && <li>⭐ {selectedItem.special}</li>}
-          </ul>
-        </div>
-      )}
+      <ItemDetails item={selectedItem} />
     </div>
   );
 }

@@ -5,8 +5,8 @@ export const WEAPONS: ContentItem[] = [
     id: "sword_iron",
     name: "Iron Sword",
     type: "Weapon",
-    attackBoost: 5,
     attackType: "melee",
+    accuracy: 95,
     evolution: {
       requirements: [{ type: "merge", count: 2 }],
       next: "sword_steel",
@@ -16,7 +16,6 @@ export const WEAPONS: ContentItem[] = [
     id: "sword_steel",
     name: "Steel Sword",
     type: "Weapon",
-    attackBoost: 9,
     attackType: "melee",
     evolution: {
       requirements: [{ type: "material", itemId: "misc_fire_crystal", amount: 1 }],
@@ -27,7 +26,8 @@ export const WEAPONS: ContentItem[] = [
     id: "sword_flame",
     name: "Flame Sword",
     type: "Weapon",
-    attackBoost: 15,
     attackType: "melee",
+    element: "Fire",
+    accuracy: 95,
   },
 ];
