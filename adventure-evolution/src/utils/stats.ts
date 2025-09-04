@@ -56,19 +56,23 @@ function getMainStatForType(type: AttackType, stats: CoreStats): number {
 
 function getResistanceByType(type: AttackType, stats: CoreStats): number {
   switch (type) {
-    case "melee":
-      return stats.STR;
-    case "ranged":
-      return stats.DEX;
-    case "magic":
-      return stats.INT;
+    case "melee": return stats.STR;
+    case "ranged": return stats.DEX;
+    case "magic": return stats.INT;
   }
 }
 
+import type { Element } from "../modules/elements";
+
 export function calculateDamageOutcome(
   attacker: { stats: CoreStats; level: number },
-  defender: { stats: CoreStats; level: number },
-  type: AttackType
+  defender: {
+    stats: CoreStats;
+    level: number;
+    resistances?: Partial<Record<Element, number>>;
+  },
+  type: AttackType,
+  element: Element = "Neutral" as Element
 ): {
   hit: boolean;
   damage: number;
@@ -77,8 +81,9 @@ export function calculateDamageOutcome(
   roll: number;
 } {
   const { stats: atkStats, level: atkLevel } = attacker;
-  const { stats: defStats, level: defLevel } = defender;
+  const { stats: defStats, level: defLevel, resistances = {} } = defender;
 
+  // Accuracy
   const mainStat = getMainStatForType(type, atkStats);
   const accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
   const defenseStat = getResistanceByType(type, defStats);
@@ -89,47 +94,30 @@ export function calculateDamageOutcome(
   const hit = roll <= hitChance;
 
   if (!hit) {
-    return {
-      hit: false,
-      damage: 0,
-      wasCrit: false,
-      hitChance,
-      roll,
-    };
+    return { hit: false, damage: 0, wasCrit: false, hitChance, roll };
   }
 
   // Base damage
   let baseDamage = 0;
   switch (type) {
-    case "melee":
-      baseDamage = atkStats.STR * 1.5 + atkLevel;
-      break;
-    case "ranged":
-      baseDamage = atkStats.DEX * 1.5 + atkLevel;
-      break;
-    case "magic":
-      baseDamage = atkStats.INT * 1.5 + atkLevel;
-      break;
+    case "melee": baseDamage = atkStats.STR * 1.5 + atkLevel; break;
+    case "ranged": baseDamage = atkStats.DEX * 1.5 + atkLevel; break;
+    case "magic": baseDamage = atkStats.INT * 1.5 + atkLevel; break;
   }
 
-  // Critical check
+  // Critical
   const critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
   const critRoll = Math.random() * 100;
   const wasCrit = critRoll < critChance;
 
   let damage = baseDamage;
-  if (wasCrit) {
-    damage *= 1.5; // crit multiplier
-  }
+  if (wasCrit) damage *= 1.5;
 
-  const mitigation = defStats.END * 0.75;
-  const finalDamage = Math.max(1, Math.round(damage - mitigation));
+  // Apply elemental resistances
+  const resistPercent = resistances[element] ?? 0;
+  const reducedDamage = damage * (1 - resistPercent / 100);
 
-  return {
-    hit: true,
-    damage: finalDamage,
-    wasCrit,
-    hitChance,
-    roll,
-  };
+  const finalDamage = Math.max(1, Math.round(reducedDamage));
+
+  return { hit: true, damage: finalDamage, wasCrit, hitChance, roll };
 }
