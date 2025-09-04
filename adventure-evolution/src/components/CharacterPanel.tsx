@@ -1,5 +1,6 @@
 import { useState } from "react";
 import StatBar from "./StatBar";
+import { ELEMENTS, ELEMENT_DETAILS, type Element } from "../modules/elements";
 
 type CoreStats = {
   STR: number;
@@ -20,6 +21,7 @@ type Entity = {
   maxHp: number;
   maxMp: number;
   maxSp: number;
+  resistances?: Partial<Record<Element, number>>; // ✅ NEW optional
 };
 
 type Props = {
@@ -35,6 +37,11 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const displayStats = showStats || isHovering;
   const isLeft = side === "left";
 
+  // Filter resistances (only show if not 100%)
+  const shownResistances = ELEMENTS.filter(
+    (el) => entity.resistances?.[el] !== undefined && entity.resistances[el] !== 100
+  );
+
   return (
     <div
       style={{
@@ -46,7 +53,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         boxSizing: "border-box",
       }}
     >
-      {/* Toggleable/Fadeable stats (always same orientation) */}
+      {/* Toggleable/Fadeable stats */}
       <div
         style={{
           marginBottom: "1rem",
@@ -73,9 +80,23 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <p>END: {entity.stats.END}</p>
         <p>CHA: {entity.stats.CHA}</p>
         <p>LUK: {entity.stats.LUK}</p>
+
+        {/* ✅ Elemental Resistances */}
+        {shownResistances.length > 0 && (
+          <div style={{ marginTop: "0.5rem" }}>
+            <h3>Elemental Resistances</h3>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "0.85rem" }}>
+              {shownResistances.map((el) => (
+                <li key={el} style={{ color: ELEMENT_DETAILS[el].color }}>
+                  {ELEMENT_DETAILS[el].label}: {entity.resistances?.[el]}%
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      {/* Portrait + Bars (mirrored based on side) */}
+      {/* Portrait + Bars */}
       <div
         style={{
           display: "flex",
@@ -103,7 +124,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           }}
         />
 
-        {/* Bars (mirror fill direction too) */}
+        {/* Bars */}
         <div style={{ flex: 1, minWidth: "180px", textAlign: "center" }}>
           <h2 style={{ margin: "0 0 0.5rem 0" }}>{entity.name}</h2>
 
