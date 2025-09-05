@@ -4,14 +4,22 @@ import type { Element } from "../modules/elements";
 export type EnemyTemplate = {
   id: string;
   name: string;
-  level: number;
+  levels: number[]; // breakpoints
   gold?: number;
   experience?: number;
-  stats: CoreStats; // same as player
+  stats: CoreStats;
   resistances?: Partial<Record<Element, number>>;
 };
 
-export type CombatEnemy = EnemyTemplate & {
+// ✅ note: NOT extending EnemyTemplate directly
+export type CombatEnemy = {
+  id: string;
+  name: string;
+  level: number; // actual chosen level
+  stats: CoreStats;
+  gold?: number;
+  experience?: number;
+  resistances?: Partial<Record<Element, number>>;
   currentHp: number;
   currentMp: number;
   currentSp: number;
@@ -21,11 +29,12 @@ export type CombatEnemy = EnemyTemplate & {
 };
 
 
+
 export const ENEMIES: EnemyTemplate[] = [
   {
     id: "slime_green",
     name: "Green Slime",
-    level: 1,
+    levels: [1, 8, 15, 20],
     gold: 5,
     experience: 10,
     stats: {
@@ -40,7 +49,7 @@ export const ENEMIES: EnemyTemplate[] = [
   {
     id: "wolf",
     name: "Hungry Wolf",
-    level: 3,
+    levels: [5, 10, 18, 25],
     stats: {
       STR: 6,
       DEX: 5,
@@ -54,7 +63,7 @@ export const ENEMIES: EnemyTemplate[] = [
   {
     id: "bandit",
     name: "Bandit",
-    level: 5,
+    levels: [20, 28, 33, 38],
     stats: {
       STR: 8,
       DEX: 7,

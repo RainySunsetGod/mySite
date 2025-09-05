@@ -7,30 +7,14 @@ import Landing from "./modules/Landing";
 import Shop from "./modules/Shop";
 import CharacterCreation from "./modules/CharacterCreation";
 import StatTrainer from "./modules/StatTrainer";
-import InventoryScreen from "./components/Inventory"; // ✅ NEW
+import InventoryScreen from "./components/Inventory";
 
-import { ENEMIES, type EnemyTemplate, type CombatEnemy } from "./data/enemies";
-import { calculateStats } from "./utils/stats";
+import { type CombatEnemy } from "./data/enemies";
 import { loadProgress, saveProgress } from "./utils/game";
+import { spawnRandomEnemy } from "./utils/spawnEnemy"; // ✅ moved out
 
 // Example shop stock
 const WEAPON_SHOP = ["sword_iron", "sword_steel"];
-
-function spawnEnemy(): CombatEnemy {
-  const base: EnemyTemplate = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
-  const derived = calculateStats({ level: base.level, stats: base.stats });
-
-  return {
-    ...base,
-    currentHp: derived.hp,
-    currentMp: derived.mp,
-    currentSp: derived.sp,
-    maxHp: derived.hp,
-    maxMp: derived.mp,
-    maxSp: derived.sp,
-  };
-}
-
 
 export default function App() {
   const [player, setPlayer] = useState<Player>(() => {
@@ -40,13 +24,16 @@ export default function App() {
         ...saved,
         currentHp: saved.maxHp, // always heal HP
         currentMp: saved.maxMp, // always heal MP
-        currentSp: 0,           // reset SP
+        currentSp: 0, // reset SP
       };
     }
     return DEFAULT_PLAYER;
   });
 
-  const [enemy, setEnemy] = useState<CombatEnemy>(spawnEnemy());
+  const [enemy, setEnemy] = useState<CombatEnemy>(() =>
+    spawnRandomEnemy(DEFAULT_PLAYER.level)
+  );
+
   const [mode, setMode] = useState<
     "creation" | "landing" | "combat" | "shop" | "trainer" | "inventory"
   >(loadProgress() ? "landing" : "creation");
@@ -65,7 +52,7 @@ export default function App() {
   };
 
   const enterCombat = () => {
-    setEnemy(spawnEnemy());
+    setEnemy(spawnRandomEnemy(player.level));
     setMode("combat");
   };
 
@@ -93,7 +80,7 @@ export default function App() {
           onEnterCombat={enterCombat}
           onEnterShop={() => setMode("shop")}
           onEnterTrainer={() => setMode("trainer")}
-          onEnterInventory={() => setMode("inventory")} // ✅ added
+          onEnterInventory={() => setMode("inventory")}
         />
       )}
 
@@ -128,11 +115,10 @@ export default function App() {
       {mode === "inventory" && (
         <InventoryScreen
           player={player}
-          setPlayer={saveAndSetPlayer} // ✅ REQUIRED
+          setPlayer={saveAndSetPlayer}
           onClose={() => setMode("landing")}
         />
       )}
-
 
       {/* Overlay Panels */}
       {mode !== "creation" && (
