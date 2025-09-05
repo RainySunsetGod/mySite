@@ -32,7 +32,7 @@ export const ENEMIES: EnemyTemplate[] = [
       STR: 3,
       DEX: 2,
       INT: 1,
-      END: 2,
+      END: 0,
       CHA: 1,
       LUK: 1,
     },

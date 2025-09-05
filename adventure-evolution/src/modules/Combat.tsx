@@ -7,6 +7,29 @@ import { getTop8ByCategory } from "../utils/inventory";
 import { getContent } from "../data/library";
 import type { ContentItem } from "../data/library/types";
 
+function checkLevelUp(player: Player): Player {
+  const xpNeeded = player.level * 100; // requirement for next level
+  if (player.experience >= xpNeeded) {
+    return {
+      ...player,
+      level: player.level + 1,
+      experience: player.experience - xpNeeded,
+      stats: {
+        ...player.stats,
+        STR: player.stats.STR + 1,
+        END: player.stats.END + 1,
+      },
+      maxHp: player.maxHp + 10,
+      currentHp: player.maxHp + 10, // heal on level up
+      maxMp: player.maxMp + 5,
+      currentMp: player.maxMp + 5,
+      maxSp: player.maxSp + 5,
+      currentSp: player.maxSp + 5,
+    };
+  }
+  return player;
+}
+
 type Turn = "player" | "enemy";
 
 type Props = {
@@ -85,11 +108,38 @@ export default function Combat({
     }
     outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
 
+    // modules/Combat.tsx (inside playerAttack after enemy defeat)
     if (enemy.currentHp - outcome.damage <= 0) {
       pushLog(`✅ You defeated the ${enemy.name}!`);
+
+      // ✅ Reward gold and experience
+      const goldReward = enemy.gold ?? 0;
+      const xpReward = enemy.experience ?? 0;
+
+      setPlayer((prev) => {
+        const updated = {
+          ...prev,
+          gold: prev.gold + goldReward,
+          experience: prev.experience + xpReward,
+        };
+
+        const leveled = checkLevelUp(updated);
+
+        if (goldReward > 0) pushLog(`💰 You gained ${goldReward} gold!`);
+        if (xpReward > 0) pushLog(`⭐ You gained ${xpReward} experience!`);
+
+        if (leveled.level > prev.level) {
+          pushLog(`⬆️ You leveled up to level ${leveled.level}!`);
+        }
+
+        return leveled;
+      });
+
       setBattleOver(true);
       return;
     }
+
+
 
     setTurn("enemy");
     setTimeout(enemyTurn, 1000);

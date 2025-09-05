@@ -21,8 +21,8 @@ type Entity = {
   maxHp: number;
   maxMp: number;
   maxSp: number;
-  gold: number;
-  experience: number;
+  gold?: number;        // player’s gold OR enemy reward
+  experience?: number;  // player’s exp OR enemy reward
   resistances?: Partial<Record<Element, number>>;
 };
 
@@ -32,17 +32,23 @@ type Props = {
   side: "left" | "right";
 };
 
+// ✅ XP threshold
+function xpForNextLevel(level: number) {
+  return level * 100;
+}
+
 export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const [showStats, setShowStats] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
   const displayStats = showStats || isHovering;
-  const isLeft = side === "left";
+  const isLeft = side === "left"; // left = player, right = enemy
 
-  // Filter resistances (only show if not 100%)
   const shownResistances = ELEMENTS.filter(
     (el) => entity.resistances?.[el] !== undefined && entity.resistances[el] !== 100
   );
+
+  const xpNeeded = xpForNextLevel(entity.level);
 
   return (
     <div
@@ -68,8 +74,24 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <div style={{ marginBottom: "0.5rem" }}>
           <h2 style={{ margin: 0 }}>{entity.name}</h2>
           <p style={{ margin: 0 }}>Level {entity.level}</p>
-          <p style={{ margin: 0 }}>Gold: {entity.gold || 0}</p>
-          <p style={{ margin: 0 }}>Experience: {entity.experience || 0} / {entity.experience || 0}</p>
+
+          {/* ✅ Player: current gold + exp progress */}
+          {isLeft && (
+            <>
+              <p style={{ margin: 0 }}>💰 Gold: {entity.gold ?? 0}</p>
+              <p style={{ margin: 0 }}>
+                ⭐ Experience: {entity.experience ?? 0} / {xpNeeded}
+              </p>
+            </>
+          )}
+
+          {/* ✅ Enemy: reward gold + exp */}
+          {!isLeft && (entity.gold !== undefined || entity.experience !== undefined) && (
+            <>
+              <p style={{ margin: 0 }}>💰 Drops: {entity.gold ?? 0} gold</p>
+              <p style={{ margin: 0 }}>⭐ Gives: {entity.experience ?? 0} XP</p>
+            </>
+          )}
         </div>
 
         <h3>Combat Defense</h3>
@@ -128,7 +150,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           }}
         />
 
-        {/* Bars */}
+        {/* Bars (HP/MP/SP only) */}
         <div style={{ flex: 1, minWidth: "180px", textAlign: "center" }}>
           <h2 style={{ margin: "0 0 0.5rem 0" }}>{entity.name}</h2>
 
