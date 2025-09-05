@@ -1,6 +1,8 @@
 import { useState } from "react";
 import StatBar from "./StatBar";
 import { ELEMENTS, ELEMENT_DETAILS, type Element } from "../modules/elements";
+import type { Player } from "../state/player";
+import { calculatePlayerResistances } from "../state/calcResistance";
 
 type CoreStats = {
   STR: number;
@@ -21,13 +23,13 @@ type Entity = {
   maxHp: number;
   maxMp: number;
   maxSp: number;
-  gold?: number;        // player’s gold OR enemy reward
-  experience?: number;  // player’s exp OR enemy reward
+  gold?: number;
+  experience?: number;
   resistances?: Partial<Record<Element, number>>;
 };
 
 type Props = {
-  entity: Entity;
+  entity: Entity | Player; // can be either enemy or player
   portraitUrl: string;
   side: "left" | "right";
 };
@@ -44,9 +46,17 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   const displayStats = showStats || isHovering;
   const isLeft = side === "left"; // left = player, right = enemy
 
-  const shownResistances = ELEMENTS.filter(
-    (el) => entity.resistances?.[el] !== undefined && entity.resistances[el] !== 100
-  );
+  // ✅ If this is the player (left side), calculate resistances dynamically
+  const effectiveEntity: Entity =
+    isLeft && "gearView" in entity
+      ? { ...entity, resistances: calculatePlayerResistances(entity as Player) }
+      : entity;
+
+  // Only show non-neutral resistances
+  const shownResistances = ELEMENTS.filter((el) => {
+    const value = effectiveEntity.resistances?.[el] ?? 100;
+    return value !== 100;
+  });
 
   const xpNeeded = xpForNextLevel(entity.level);
 
@@ -86,12 +96,15 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           )}
 
           {/* ✅ Enemy: reward gold + exp */}
-          {!isLeft && (entity.gold !== undefined || entity.experience !== undefined) && (
-            <>
-              <p style={{ margin: 0 }}>💰 Drops: {entity.gold ?? 0} gold</p>
-              <p style={{ margin: 0 }}>⭐ Gives: {entity.experience ?? 0} XP</p>
-            </>
-          )}
+          {!isLeft &&
+            (entity.gold !== undefined || entity.experience !== undefined) && (
+              <>
+                <p style={{ margin: 0 }}>💰 Drops: {entity.gold ?? 0} gold</p>
+                <p style={{ margin: 0 }}>
+                  ⭐ Gives: {entity.experience ?? 0} XP
+                </p>
+              </>
+            )}
         </div>
 
         <h3>Combat Defense</h3>
@@ -111,12 +124,22 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         {shownResistances.length > 0 && (
           <div style={{ marginTop: "0.5rem" }}>
             <h3>Elemental Resistances</h3>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: "0.85rem" }}>
-              {shownResistances.map((el) => (
-                <li key={el} style={{ color: ELEMENT_DETAILS[el].color }}>
-                  {ELEMENT_DETAILS[el].label}: {entity.resistances?.[el]}%
-                </li>
-              ))}
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                fontSize: "0.85rem",
+              }}
+            >
+              {shownResistances.map((el) => {
+                const value = effectiveEntity.resistances?.[el] ?? 100;
+                return (
+                  <li key={el} style={{ color: ELEMENT_DETAILS[el].color }}>
+                    {ELEMENT_DETAILS[el].label}: {value}%
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -155,26 +178,65 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           <h2 style={{ margin: "0 0 0.5rem 0" }}>{entity.name}</h2>
 
           {/* HP */}
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem" }}>
-            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>HP</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "0.25rem",
+            }}
+          >
+            <span
+              style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}
+            >
+              HP
+            </span>
             <div style={{ flex: 1 }}>
-              <StatBar current={entity.currentHp} max={entity.maxHp} color="red" align={isLeft ? "left" : "right"} />
+              <StatBar
+                current={entity.currentHp}
+                max={entity.maxHp}
+                color="red"
+                align={isLeft ? "left" : "right"}
+              />
             </div>
           </div>
 
           {/* MP */}
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem" }}>
-            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>MP</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "0.25rem",
+            }}
+          >
+            <span
+              style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}
+            >
+              MP
+            </span>
             <div style={{ flex: 1 }}>
-              <StatBar current={entity.currentMp} max={entity.maxMp} color="blue" align={isLeft ? "left" : "right"} />
+              <StatBar
+                current={entity.currentMp}
+                max={entity.maxMp}
+                color="blue"
+                align={isLeft ? "left" : "right"}
+              />
             </div>
           </div>
 
           {/* SP */}
           <div style={{ display: "flex", alignItems: "center" }}>
-            <span style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}>SP</span>
+            <span
+              style={{ width: "30px", textAlign: "right", marginRight: "0.5rem" }}
+            >
+              SP
+            </span>
             <div style={{ flex: 1 }}>
-              <StatBar current={entity.currentSp} max={entity.maxSp} color="green" align={isLeft ? "left" : "right"} />
+              <StatBar
+                current={entity.currentSp}
+                max={entity.maxSp}
+                color="green"
+                align={isLeft ? "left" : "right"}
+              />
             </div>
           </div>
         </div>

@@ -26,8 +26,6 @@ export type ContentItem = {
   type: ContentType;
 
   // Existing fields
-  attackBoost?: number;
-  defenseBoost?: number;
   cost?: number;        // for spells
   description?: string; // for spells/misc
   power?: number;       // spells: positive = damage, negative = healing

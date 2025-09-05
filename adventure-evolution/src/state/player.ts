@@ -1,3 +1,6 @@
+import type { Element } from "../modules/elements";
+
+
 export type GearView = {
   Weapons: string[];
   Armor: string[];
@@ -44,6 +47,8 @@ export type Player = {
   merges: Record<string, number>;
   usage: Record<string, number>;
   materials: Record<string, number>;
+
+  resistances?: Partial<Record<Element, number>>;
 };
 
 
@@ -52,15 +57,12 @@ export const DEFAULT_PLAYER: Player = {
   level: 1,
   gold: 0,
   experience: 0,
-
   currentHp: 50,
   currentMp: 20,
   currentSp: 30,
-
   maxHp: 50,
   maxMp: 20,
   maxSp: 30,
-
   stats: {
     STR: 0,
     DEX: 0,
@@ -69,11 +71,8 @@ export const DEFAULT_PLAYER: Player = {
     CHA: 0,
     LUK: 0,
   },
-
-  unspentPoints: 5, // NEW: Based on level
-
+  unspentPoints: 5,
   inventory: ["sword_iron", "spell_fireball", "pet_fireling"],
-
   gearView: {
     Weapons: ["sword_iron"],
     Armor: [],
@@ -82,11 +81,14 @@ export const DEFAULT_PLAYER: Player = {
     Spells: ["spell_fireball"],
     Misc: [],
   },
-
   merges: {},
   usage: {},
   materials: {},
+
+  // ✅ neutral by default, only overridden by gear/items
+  resistances: {},
 };
+
 
 export function allocatePlayerStats(
   player: Player,
