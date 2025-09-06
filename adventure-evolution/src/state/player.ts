@@ -125,3 +125,21 @@ export function levelUp(player: Player): Player {
     unspentPoints: player.unspentPoints + 5,
   };
 }
+
+export function resetPlayerStats(player: Player): Player {
+  // Total points earned = (level - 1) * 5
+  const totalEarned = player.level * 5;
+
+  return {
+    ...player,
+    stats: {
+      STR: 0,
+      DEX: 0,
+      INT: 0,
+      END: 0,
+      CHA: 0,
+      LUK: 0,
+    },
+    unspentPoints: totalEarned,
+  };
+}

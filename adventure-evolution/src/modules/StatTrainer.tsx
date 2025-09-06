@@ -1,8 +1,8 @@
-// src/modules/StatTrainer.tsx
 import { useState } from "react";
 import type { Player, CoreStats } from "../state/player";
 import { allocatePlayerStats } from "../utils/statTrainer";
 import { saveProgress } from "../utils/game";
+import { resetPlayerStats } from "../state/player";
 
 type Props = {
     player: Player;
@@ -41,6 +41,13 @@ export default function StatTrainer({ player, setPlayer, onExit }: Props) {
         }
     };
 
+    const handleReset = () => {
+        const reset = resetPlayerStats(player);
+        setPlayer(reset);
+        saveProgress(reset);
+        onExit();
+    };
+
     return (
         <div style={{ textAlign: "center", paddingTop: "2rem" }}>
             <h2>Stat Trainer</h2>
@@ -51,7 +58,6 @@ export default function StatTrainer({ player, setPlayer, onExit }: Props) {
                     {key}: {player.stats[key as keyof Player["stats"]]} + {value}
                     <button onClick={() => adjustStat(key as keyof CoreStats, 1)}>+</button>
                     <button onClick={() => adjustStat(key as keyof CoreStats, -1)}>-</button>
-
                 </div>
             ))}
 
@@ -60,6 +66,9 @@ export default function StatTrainer({ player, setPlayer, onExit }: Props) {
             </button>
             <button onClick={onExit} style={{ marginLeft: "1rem" }}>
                 Cancel
+            </button>
+            <button onClick={handleReset} style={{ marginLeft: "1rem", color: "red" }}>
+                Reset Stats
             </button>
         </div>
     );
