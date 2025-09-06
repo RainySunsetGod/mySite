@@ -9,9 +9,9 @@ import CharacterCreation from "./modules/CharacterCreation";
 import StatTrainer from "./modules/StatTrainer";
 import InventoryScreen from "./components/Inventory";
 
-import { type CombatEnemy } from "./data/enemies";
+import type { CombatEnemy } from "./data/enemies/types";
 import { loadProgress, saveProgress } from "./utils/game";
-import { spawnRandomEnemy } from "./utils/spawnEnemy"; // ✅ moved out
+import { spawnRandomEnemy } from "./utils/spawnEnemy";
 
 // Example shop stock
 const WEAPON_SHOP = ["sword_iron", "sword_steel"];
