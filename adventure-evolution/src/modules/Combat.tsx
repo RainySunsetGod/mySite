@@ -1,14 +1,15 @@
 import { useState } from "react";
 import type { Player } from "../state/player";
-import type { CombatEnemy } from "../data/enemies";
+import type { CombatEnemy } from "../data/enemies/types";
 import ActionMenu from "../components/ActionMenu";
 import { calculateStats, calculateDamageOutcome } from "../utils/stats";
 import { getTop8ByCategory } from "../utils/inventory";
 import { getContent } from "../data/library";
 import type { ContentItem } from "../data/library/types";
+import type { Element } from "../modules/elements";
 
 function checkLevelUp(player: Player): Player {
-  const xpNeeded = player.level * 100; // requirement for next level
+  const xpNeeded = player.level * 100;
   if (player.experience >= xpNeeded) {
     return {
       ...player,
@@ -20,7 +21,7 @@ function checkLevelUp(player: Player): Player {
         END: player.stats.END + 1,
       },
       maxHp: player.maxHp + 10,
-      currentHp: player.maxHp + 10, // heal on level up
+      currentHp: player.maxHp + 10,
       maxMp: player.maxMp + 5,
       currentMp: player.maxMp + 5,
       maxSp: player.maxSp + 5,
@@ -52,11 +53,10 @@ export default function Combat({
   const [battleOver, setBattleOver] = useState(false);
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
-
   const top8 = getTop8ByCategory(player);
 
   const pushLog = (msg: string) =>
-    setLog((prev) => [...prev, msg].slice(-10)); // keep last 10
+    setLog((prev) => [...prev, msg].slice(-10));
 
   const regenSp = () => {
     setPlayer((prev) => {
@@ -75,16 +75,24 @@ export default function Combat({
   const playerAttack = () => {
     if (turn !== "player" || battleOver) return;
 
-    // ✅ Determine equipped weapon
     const weaponId = player.gearView.Weapons?.[0] ?? null;
     const playerWeapon: ContentItem | null = weaponId
       ? getContent(weaponId) || null
       : null;
 
     const outcome = calculateDamageOutcome(
-      { stats: player.stats, level: player.level, weapon: playerWeapon ?? undefined },
-      { stats: enemy.stats, level: enemy.level },
-      playerWeapon?.attackType ?? "melee"
+      {
+        stats: player.stats,
+        level: player.level,
+        weapon: playerWeapon ?? undefined,
+      },
+      {
+        stats: enemy.stats,
+        level: enemy.level,
+        resistances: enemy.resistances,
+      },
+      playerWeapon?.attackType ?? "melee",
+      playerWeapon?.element as Element | undefined // ✅ if weapon has an element
     );
 
     if (!outcome.hit) {
@@ -102,17 +110,20 @@ export default function Combat({
       }
     }
 
-    pushLog(`🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+    pushLog(
+      `🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
+    );
     if (playerWeapon) {
       pushLog(`⚔️ Weapon: ${playerWeapon.name}`);
     }
+    if (playerWeapon?.element) {
+      pushLog(`🌟 Element: ${playerWeapon.element}`);
+    }
     outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
 
-    // modules/Combat.tsx (inside playerAttack after enemy defeat)
     if (enemy.currentHp - outcome.damage <= 0) {
       pushLog(`✅ You defeated the ${enemy.name}!`);
 
-      // ✅ Reward gold and experience
       const goldReward = enemy.gold ?? 0;
       const xpReward = enemy.experience ?? 0;
 
@@ -139,8 +150,6 @@ export default function Combat({
       return;
     }
 
-
-
     setTurn("enemy");
     setTimeout(enemyTurn, 1000);
   };
@@ -148,10 +157,21 @@ export default function Combat({
   const enemyTurn = () => {
     if (battleOver) return;
 
+    const attackType = enemy.attackType ?? "melee"; // ✅ support attackType
+    const attackElement = enemy.element; // ✅ general element of attacks
+
     const outcome = calculateDamageOutcome(
-      { stats: enemy.stats, level: enemy.level },
-      { stats: player.stats, level: player.level },
-      "melee"
+      {
+        stats: enemy.stats,
+        level: enemy.level,
+      },
+      {
+        stats: player.stats,
+        level: player.level,
+        resistances: player.resistances,
+      },
+      attackType,
+      attackElement
     );
 
     if (!outcome.hit) {
@@ -163,13 +183,26 @@ export default function Combat({
       }));
 
       if (outcome.wasCrit) {
-        pushLog(`❗ ${enemy.name} critically hits you for ${outcome.damage} damage!`);
+        pushLog(
+          `❗ ${enemy.name} critically hits you for ${outcome.damage} ${
+            attackElement ?? ""
+          } damage!`
+        );
       } else {
-        pushLog(`${enemy.name} hits you for ${outcome.damage} damage.`);
+        pushLog(
+          `${enemy.name} hits you for ${outcome.damage} ${
+            attackElement ?? ""
+          } damage.`
+        );
       }
     }
 
-    pushLog(`🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`);
+    pushLog(
+      `🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
+    );
+    if (attackElement) {
+      pushLog(`🌟 Element: ${attackElement}`);
+    }
     outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
 
     if (player.currentHp - outcome.damage <= 0) {

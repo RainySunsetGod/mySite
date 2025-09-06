@@ -1,5 +1,6 @@
-// modules/elements.ts
+// src/modules/elements.ts
 
+// Core element union type
 export type Element =
     | "Fire"
     | "Water"
@@ -9,6 +10,9 @@ export type Element =
     | "Darkness"
     | "Wind"
     | "Earth";
+
+// ✅ Explicitly allow use as Record key
+export type ElementKey = Element & string;
 
 export const ELEMENTS: Element[] = [
     "Fire",

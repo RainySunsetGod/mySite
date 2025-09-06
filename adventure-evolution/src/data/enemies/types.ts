@@ -1,5 +1,6 @@
+// src/data/enemies/types.ts
 import type { CoreStats } from "../../utils/stats";
-import type { Element } from "../../modules/elements";
+import type { Element, ElementKey } from "../../modules/elements";
 
 export type EnemyLevelData = {
   level: number;
@@ -11,18 +12,23 @@ export type EnemyLevelData = {
 export type EnemyTemplate = {
   id: string;
   name: string;
-  levels: EnemyLevelData[]; // breakpoints
-  resistances?: Partial<Record<Element, number>>;
+  element?: Element; // ✅ default attack element
+  attackType?: "melee" | "ranged" | "magic"; // ✅ attack style
+  levels: EnemyLevelData[];
+  resistances?: Partial<Record<ElementKey, number>>;
 };
 
+// ✅ CombatEnemy is now a snapshot, no `levels[]`
 export type CombatEnemy = {
   id: string;
   name: string;
-  level: number; // chosen variant
+  element?: Element;
+  attackType?: "melee" | "ranged" | "magic";
+  level: number;
   stats: CoreStats;
   gold: number;
   experience: number;
-  resistances?: Partial<Record<Element, number>>;
+  resistances?: Partial<Record<ElementKey, number>>;
   currentHp: number;
   currentMp: number;
   currentSp: number;

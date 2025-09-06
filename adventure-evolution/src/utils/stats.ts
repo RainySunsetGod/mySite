@@ -1,5 +1,6 @@
-// utils/stats.ts
+// src/utils/stats.ts
 import type { ContentItem } from "../data/library/types";
+import type { Element } from "../modules/elements";
 
 export type AttackType = "melee" | "ranged" | "magic";
 
@@ -51,24 +52,31 @@ export function calculateStats(entity: { level: number; stats: CoreStats }): Der
 
 function getMainStatForType(type: AttackType, stats: CoreStats): number {
   switch (type) {
-    case "melee": return stats.STR;
-    case "ranged": return stats.DEX;
-    case "magic": return stats.INT;
+    case "melee":
+      return stats.STR;
+    case "ranged":
+      return stats.DEX;
+    case "magic":
+      return stats.INT;
   }
 }
 
 function getResistanceByType(type: AttackType, stats: CoreStats): number {
   switch (type) {
-    case "melee": return stats.STR;
-    case "ranged": return stats.DEX;
-    case "magic": return stats.INT;
+    case "melee":
+      return stats.STR;
+    case "ranged":
+      return stats.DEX;
+    case "magic":
+      return stats.INT;
   }
 }
 
 export function calculateDamageOutcome(
   attacker: { stats: CoreStats; level: number; weapon?: ContentItem },
-  defender: { stats: CoreStats; level: number },
-  type: AttackType
+  defender: { stats: CoreStats; level: number; resistances?: Partial<Record<Element, number>> },
+  type: AttackType,
+  element?: Element
 ): {
   hit: boolean;
   damage: number;
@@ -78,7 +86,7 @@ export function calculateDamageOutcome(
   debug: string[];
 } {
   const { stats: atkStats, level: atkLevel, weapon } = attacker;
-  const { stats: defStats, level: defLevel } = defender;
+  const { stats: defStats, level: defLevel, resistances } = defender;
 
   const debug: string[] = [];
 
@@ -87,14 +95,14 @@ export function calculateDamageOutcome(
   let accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
 
   if (weapon?.accuracy !== undefined) {
-    accuracy += weapon.accuracy; // ✅ Apply weapon bonus
+    accuracy += weapon.accuracy;
     debug.push(`Weapon accuracy bonus applied: +${weapon.accuracy}`);
   }
 
   const defenseStat = getResistanceByType(type, defStats);
-  const resistance = defenseStat * 2 + defStats.LUK + defLevel;
+  const resistanceVal = defenseStat * 2 + defStats.LUK + defLevel;
 
-  const hitChance = accuracy - resistance + 50;
+  const hitChance = accuracy - resistanceVal + 50;
   const roll = Math.random() * 100;
   const hit = roll <= hitChance;
 
@@ -136,7 +144,7 @@ export function calculateDamageOutcome(
   // === Critical Check ===
   let critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
   if (weapon?.critBonus !== undefined) {
-    critChance += weapon.critBonus; // ✅ Apply weapon crit bonus
+    critChance += weapon.critBonus;
     debug.push(`Weapon crit bonus applied: +${weapon.critBonus}`);
   }
 
@@ -150,7 +158,17 @@ export function calculateDamageOutcome(
     debug.push(`No crit. Roll: ${critRoll.toFixed(1)} vs ${critChance.toFixed(1)}`);
   }
 
-  const finalDamage = Math.max(1, Math.round(baseDamage));
+  // === Apply Elemental Resistance ===
+  let finalDamage = Math.max(1, Math.round(baseDamage));
+
+  if (element && resistances) {
+    const res = resistances[element] ?? 100;
+    const adjusted = Math.floor((finalDamage * res) / 100);
+    debug.push(
+      `Elemental check: ${element}, resistance ${res}%. Damage adjusted from ${finalDamage} → ${adjusted}`
+    );
+    finalDamage = Math.max(1, adjusted);
+  }
 
   debug.push(`Final damage dealt: ${finalDamage}`);
 
