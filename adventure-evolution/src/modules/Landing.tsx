@@ -42,7 +42,7 @@ export default function Landing({
       </button>
 
       <button onClick={onEnterCombat} style={{ margin: "0.5rem" }}>
-        Go Adventuring
+        Random Encounter
       </button>
 
       <button onClick={onEnterInventory} style={{ margin: "0.5rem" }}>
