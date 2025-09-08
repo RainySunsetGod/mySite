@@ -1,4 +1,4 @@
-import type { EnemyTemplate } from "./types";
+import type { EnemyTemplate } from "../types";
 
 export const VAMPIRES: EnemyTemplate[] = [
     {

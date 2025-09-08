@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Player } from "../state/player";
 import { getContent } from "../data/library";
 import type { ContentType, ContentItem } from "../data/library/types";
-import ItemDetails from "./ItemDetails"; // ✅ new shared component
+import ItemDetails from "./ItemDetails";
 
 type Props = {
   player: Player;
@@ -108,7 +108,7 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
           ))}
         </div>
 
-        {/* Inventory List */}
+        {/* Scrollable inventory list with limited visible height */}
         <div
           style={{
             display: "flex",
