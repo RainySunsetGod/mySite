@@ -27,7 +27,7 @@ export default function Landing({
 
   return (
     <div style={{ textAlign: "center", paddingTop: "2rem" }}>
-      <h2>Welcome to Town</h2>
+      <h2 className="neon-flicker">Welcome to Neon Town</h2>
 
       <button onClick={handleHeal} style={{ margin: "0.5rem" }}>
         Rest at Inn

@@ -63,7 +63,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   return (
     <div
       style={{
-        border: "2px solid red",
+        // border: "2px solid red",
         padding: "1rem",
         height: "100%",
         display: "flex",

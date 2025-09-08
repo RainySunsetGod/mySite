@@ -1,3 +1,5 @@
+import './App.css';
+
 import { useState } from "react";
 import { DEFAULT_PLAYER, type Player } from "./state/player";
 import PlayerPanel from "./components/PlayerPanel";

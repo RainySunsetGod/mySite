@@ -77,7 +77,7 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
     <div style={{ display: "flex", padding: "2rem", gap: "2rem" }}>
       {/* Left: Inventory */}
       <div style={{ flex: 1, textAlign: "center" }}>
-        <h2>Inventory</h2>
+        <h2 className="neon-flicker">Inventory</h2>
 
         {/* Category Icons */}
         <div
@@ -93,10 +93,10 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
               key={type}
               onClick={() => setActiveType(type as ContentType)}
               style={{
-                width: "48px",
-                height: "48px",
+                // width: "48px",
+                // height: "48px",
                 fontSize: "1.5rem",
-                backgroundColor: type === activeType ? "#ffcc00" : "#eee",
+                backgroundColor: type === activeType ? "#ffcc00" : "#ff00c833",
                 border: "2px solid #555",
                 borderRadius: "6px",
                 cursor: "pointer",
@@ -134,9 +134,9 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
                 style={{
                   width: "260px",
                   padding: "0.75rem",
-                  border: "2px solid #444",
+                  border: "2px solid #ff00c8",
                   borderRadius: "6px",
-                  backgroundColor: draggedId === item.id ? "#aa2222" : "#d33",
+                  // backgroundColor: draggedId === item.id ? "#aa2222" : "#d33",
                   color: "#fff",
                   fontWeight: "bold",
                   fontSize: "0.85rem",

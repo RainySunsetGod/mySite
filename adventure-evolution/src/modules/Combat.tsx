@@ -275,7 +275,7 @@ export default function Combat({
           border: "1px solid #ccc",
           padding: "0.5rem",
           fontSize: "0.9rem",
-          background: "rgba(255,255,255,0.8)",
+          // background: "rgba(255,255,255,0.8)",
         }}
       >
         {log.map((entry, i) => (
