@@ -46,7 +46,6 @@ export default function StatTrainer({ player, setPlayer, onExit }: Props) {
         const reset = resetPlayerStats(player);
         setPlayer(reset);
         saveProgress(reset);
-        onExit();
     };
 
     return (
