@@ -3,6 +3,7 @@ import type { Player } from "../state/player";
 import { getContent } from "../data/library";
 import type { ContentType, ContentItem } from "../data/library/types";
 import ItemDetails from "./ItemDetails";
+import styles from "./Inventory.module.css";
 
 type Props = {
   player: Player;
@@ -74,33 +75,16 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
   };
 
   return (
-    <div style={{ display: "flex", padding: "2rem", gap: "2rem" }}>
-      {/* Left: Inventory */}
-      <div style={{ flex: 1, textAlign: "center" }}>
-        <h2 className="neon-flicker">Inventory</h2>
+    <div className={styles.container}>
+      <div className={styles.leftPane}>
+        <h2 className={`${styles.title} neon-flicker`}>Inventory</h2>
 
-        {/* Category Icons */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1rem",
-            gap: "0.5rem",
-          }}
-        >
+        <div className={styles.categoryBar}>
           {Object.entries(TYPE_ICONS).map(([type, icon]) => (
             <button
               key={type}
               onClick={() => setActiveType(type as ContentType)}
-              style={{
-                // width: "48px",
-                // height: "48px",
-                fontSize: "1.5rem",
-                backgroundColor: type === activeType ? "#ffcc00" : "#ff00c833",
-                border: "2px solid #555",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
+              className={`${styles.categoryButton} ${activeType === type ? styles.categoryButtonActive : ""}`}
               title={type}
             >
               {icon}
@@ -108,18 +92,7 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
           ))}
         </div>
 
-        {/* Scrollable inventory list with limited visible height */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            maxHeight: "400px",
-            overflowY: "auto",
-            padding: "0.5rem",
-          }}
-        >
+        <div className={styles.inventoryList}>
           {filteredItems.length === 0 ? (
             <p>No items in this category.</p>
           ) : (
@@ -131,27 +104,10 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop(item.id)}
                 onClick={() => setSelectedItem(item)}
-                style={{
-                  width: "260px",
-                  padding: "0.75rem",
-                  border: "2px solid #ff00c8",
-                  borderRadius: "6px",
-                  // backgroundColor: draggedId === item.id ? "#aa2222" : "#d33",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: "0.85rem",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  opacity: draggedId === item.id ? 0.6 : 1,
-                  cursor: "pointer",
-                }}
+                className={`${styles.itemCard} ${draggedId === item.id ? styles.dragging : ""}`}
               >
-                <div style={{ flex: 1, textAlign: "left" }}>{item.name}</div>
-
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
-                >
+                <div className={styles.itemName}>{item.name}</div>
+                <div className={styles.arrowGroup}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -176,16 +132,13 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
           )}
         </div>
 
-        <button
-          onClick={onClose}
-          style={{ marginTop: "2rem", padding: "0.5rem 1.25rem" }}
-        >
+        <button onClick={onClose} className={styles.closeButton}>
           Close
         </button>
       </div>
 
-      {/* Right: Item Details */}
       <ItemDetails item={selectedItem} />
     </div>
+
   );
 }

@@ -4,40 +4,56 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0f0f1b;
-  font-family: 'Segoe UI', sans-serif;
-  color: #39ff14;
-  /* neon green */
+  background-color: #0d0d1f;
+  /* dark fantasy base */
+  font-family: 'Orbitron', sans-serif;
+  /* futuristic font */
+  color: #d0ffe4;
+  /* soft tech-green */
 }
 
+h1,
 h2,
 h3 {
-  color: #00f7ff;
-  text-shadow: 0 0 4px #00f7ff, 0 0 8px #00f7ff;
+  color: #00fff2;
+  text-shadow: 0 0 6px #00fff2, 0 0 12px #007a78;
 }
 
 button {
-  background-color: transparent;
-  border: 2px solid #ff00c8;
-  color: #ff00c8;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  background: linear-gradient(90deg, #ff00e0, #00ffee);
+  color: #0d0d1f;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 0 6px #00ffee;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 0 5px #ff00c8;
 }
 
 button:hover {
-  background-color: #ff00c833;
-  box-shadow: 0 0 10px #ff00c8, 0 0 20px #ff00c8;
+  box-shadow: 0 0 12px #00ffee, 0 0 24px #ff00e0;
+  transform: scale(1.05);
 }
 
+
 @keyframes flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
     opacity: 1;
   }
-  20%, 22%, 24%, 55% {
+
+  20%,
+  22%,
+  24%,
+  55% {
     opacity: 0.3;
   }
 }

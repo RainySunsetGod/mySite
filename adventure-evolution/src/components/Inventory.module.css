@@ -1,0 +1,127 @@
+/* InventoryScreen.module.css */
+
+.container {
+    display: flex;
+    padding: 2rem;
+    gap: 2rem;
+    color: #d0ffe4;
+}
+
+.leftPane {
+    flex: 1;
+    text-align: center;
+}
+
+.title {
+    font-size: 2rem;
+    color: #00fff2;
+    text-shadow: 0 0 6px #00fff2, 0 0 12px #007a78;
+    margin-bottom: 1rem;
+}
+
+.categoryBar {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.categoryButton {
+    font-size: 1.5rem;
+    background-color: #222;
+    border: 2px solid #00ffee;
+    border-radius: 6px;
+    color: #00ffee;
+    cursor: pointer;
+    padding: 0.25rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.categoryButtonActive {
+    background-color: #00ffee;
+    color: #0d0d1f;
+    box-shadow: 0 0 8px #00ffee, 0 0 16px #00ffee;
+}
+
+.inventoryList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.itemCard {
+    width: 260px;
+    padding: 0.75rem;
+    border: 2px solid #ff00c8;
+    border-radius: 6px;
+    background-color: #1c1c2b;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.itemCard:hover {
+    box-shadow: 0 0 8px #ff00c8;
+}
+
+.itemCard.dragging {
+    opacity: 0.6;
+    background-color: #330022;
+}
+
+.itemName {
+    flex: 1;
+    text-align: left;
+}
+
+.arrowGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.arrowGroup button {
+    background: transparent;
+    color: #00ffee;
+    border: 1px solid #00ffee;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.arrowGroup button:hover:not(:disabled) {
+    background-color: #00ffee33;
+    box-shadow: 0 0 6px #00ffee;
+}
+
+.arrowGroup button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.closeButton {
+    margin-top: 2rem;
+    padding: 0.5rem 1.25rem;
+    background-color: transparent;
+    border: 2px solid #ff00c8;
+    color: #ff00c8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+    background-color: #ff00c833;
+    box-shadow: 0 0 10px #ff00c8;
+}
