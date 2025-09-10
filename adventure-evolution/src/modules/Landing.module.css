@@ -1,0 +1,43 @@
+/* Landing.module.css */
+
+.container {
+  text-align: center;
+  padding-top: 3rem;
+  color: #d0ffe4;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.title {
+  font-size: 2.2rem;
+  color: #00fff2;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 6px #00fff2, 0 0 12px #007a78;
+}
+
+.buttonGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.actionButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  background-color: rgba(0, 255, 255, 0.1);
+  border: 2px solid #00fff2;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: bold;
+  text-shadow: 0 0 2px #00fff2, 0 0 6px #000;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  width: 240px;
+  box-shadow: 0 0 6px #00fff233;
+}
+
+.actionButton:hover {
+  background-color: rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 12px #00fff2, 0 0 24px #00fff2;
+  transform: scale(1.05);
+}

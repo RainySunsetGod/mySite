@@ -1,5 +1,6 @@
 import type { Player } from "../state/player";
 import { fullHeal, saveProgress } from "../utils/game";
+import styles from "./Landing.module.css"; // 👈 import the styles
 
 type Props = {
   player: Player;
@@ -7,7 +8,7 @@ type Props = {
   onEnterCombat: () => void;
   onEnterShop: () => void;
   onEnterTrainer: () => void;
-  onEnterInventory: () => void; // ✅ NEW
+  onEnterInventory: () => void;
 };
 
 export default function Landing({
@@ -16,7 +17,7 @@ export default function Landing({
   onEnterCombat,
   onEnterShop,
   onEnterTrainer,
-  onEnterInventory, // ✅ NEW
+  onEnterInventory,
 }: Props) {
   const handleHeal = () => {
     const healed = fullHeal(player);
@@ -26,28 +27,26 @@ export default function Landing({
   };
 
   return (
-    <div style={{ textAlign: "center", paddingTop: "2rem" }}>
-      <h2 className="neon-flicker">Welcome to Neon Town</h2>
+    <div className={styles.container}>
+      <h2 className={`${styles.title} neon-flicker`}>Welcome to Neon Town</h2>
 
-      <button onClick={handleHeal} style={{ margin: "0.5rem" }}>
-        Rest at Inn
-      </button>
-
-      <button onClick={onEnterShop} style={{ margin: "0.5rem" }}>
-        Visit Shop
-      </button>
-
-      <button onClick={onEnterTrainer} style={{ margin: "0.5rem" }}>
-        Visit Stat Trainer
-      </button>
-
-      <button onClick={onEnterCombat} style={{ margin: "0.5rem" }}>
-        Random Encounter
-      </button>
-
-      <button onClick={onEnterInventory} style={{ margin: "0.5rem" }}>
-        View Inventory
-      </button>
+      <div className={styles.buttonGrid}>
+        <button className={styles.actionButton} onClick={handleHeal}>
+          Rest at Inn
+        </button>
+        <button className={styles.actionButton} onClick={onEnterShop}>
+          Visit Shop
+        </button>
+        <button className={styles.actionButton} onClick={onEnterTrainer}>
+          Visit Stat Trainer
+        </button>
+        <button className={styles.actionButton} onClick={onEnterCombat}>
+          Random Encounter
+        </button>
+        <button className={styles.actionButton} onClick={onEnterInventory}>
+          View Inventory
+        </button>
+      </div>
     </div>
   );
 }
