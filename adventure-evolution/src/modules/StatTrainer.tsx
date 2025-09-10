@@ -3,6 +3,7 @@ import type { Player, CoreStats } from "../state/player";
 import { allocatePlayerStats } from "../utils/statTrainer";
 import { saveProgress } from "../utils/game";
 import { resetPlayerStats } from "../state/player";
+import styles from "./StatTrainer.module.css"; // <-- NEW
 
 type Props = {
     player: Player;
@@ -49,27 +50,29 @@ export default function StatTrainer({ player, setPlayer, onExit }: Props) {
     };
 
     return (
-        <div style={{ textAlign: "center", paddingTop: "2rem" }}>
-            <h2>Stat Trainer</h2>
-            <p>Unspent Points: {pointsLeft}</p>
+        <div className={styles.container}>
+            <h2 className={styles.title}>Stat Trainer</h2>
+            <p className={styles.pointsLeft}>Unspent Points: {pointsLeft}</p>
 
             {Object.entries(allocation).map(([key, value]) => (
-                <div key={key}>
+                <div key={key} className={styles.statRow}>
                     {key}: {player.stats[key as keyof Player["stats"]]} + {value}
                     <button onClick={() => adjustStat(key as keyof CoreStats, 1)}>+</button>
                     <button onClick={() => adjustStat(key as keyof CoreStats, -1)}>-</button>
                 </div>
             ))}
 
-            <button disabled={pointsLeft !== 0} onClick={confirm} style={{ marginTop: "1rem" }}>
-                Confirm Allocation
-            </button>
-            <button onClick={onExit} style={{ marginLeft: "1rem" }}>
-                Cancel
-            </button>
-            <button onClick={handleReset} style={{ marginLeft: "1rem", color: "red" }}>
-                Reset Stats
-            </button>
+            <div className={styles.actions}>
+                <button disabled={pointsLeft !== 0} onClick={confirm}>
+                    Confirm Allocation
+                </button>
+                <button onClick={onExit}>
+                    Cancel
+                </button>
+                <button onClick={handleReset} className={styles.resetButton}>
+                    Reset Stats
+                </button>
+            </div>
         </div>
     );
 }

@@ -1,0 +1,105 @@
+/* StatTrainer.module.css */
+
+.container {
+    text-align: center;
+    padding-top: 2rem;
+    background: linear-gradient(160deg, #0d0d1f, #1c1c2b);
+    border: 2px solid #2affff33;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 24px #00fff233;
+    padding-bottom: 2rem;
+}
+
+.title {
+    font-size: 2.2rem;
+    color: #7df9ff;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 6px #00fff2, 0 0 18px #007a78;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+.pointsLeft {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #39ff14;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 2px #39ff14;
+}
+
+.statRow {
+    margin: 0.75rem 0;
+    font-size: 1.1rem;
+    color: #e0f8ff;
+    text-shadow: 0 0 2px #ffffff33;
+}
+
+.statRow button {
+    margin-left: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: #111;
+    border: 2px solid #00ffee;
+    color: #00ffee;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 6px #00ffee44;
+}
+
+.statRow button:hover {
+    background: #00ffee33;
+    box-shadow: 0 0 12px #00ffee;
+}
+
+.actions {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    border: 2px solid #ff00c8;
+    border-radius: 8px;
+    background-color: rgba(255, 0, 200, 0.15);
+    /* translucent magenta background */
+    color: #ffffff;
+    /* high contrast text */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 2px #ff00c8, 0 0 4px #000;
+    box-shadow: 0 0 6px #ff00c855;
+}
+
+.actions button:hover {
+    background-color: rgba(255, 0, 200, 0.35);
+    box-shadow: 0 0 12px #ff00c8, 0 0 24px #ff00c8;
+}
+
+
+.resetButton {
+    border-color: #ff4444;
+    color: #ffffff;
+    background-color: rgba(255, 68, 68, 0.15);
+    text-shadow: 0 0 2px #ff4444, 0 0 4px #000;
+}
+
+.resetButton:hover {
+    background-color: rgba(255, 68, 68, 0.35);
+    box-shadow: 0 0 12px #ff4444, 0 0 20px #ff4444;
+}
+
+
+.actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
