@@ -4,6 +4,7 @@ import type { ContentItem, ContentType, Skill } from "../data/library/types";
 import { getContent } from "../data/library";
 import { equipItem } from "../utils/equip";
 import ItemDetails from "./ItemDetails";
+import styles from "./ActionMenu.module.css";
 
 type Props = {
   player: Player;
@@ -30,13 +31,6 @@ export default function ActionMenu({
     setHoveredItem(null);
   };
 
-  const buttonStyle: React.CSSProperties = {
-    width: "120px",
-    padding: "0.5rem",
-    textAlign: "center",
-    boxSizing: "border-box",
-  };
-
   const armorItem = equippedArmorId ? getContent(equippedArmorId) : null;
   const armorSkills: Skill[] = armorItem?.skills ?? [];
 
@@ -50,19 +44,11 @@ export default function ActionMenu({
   };
 
   return (
-    <div style={{ position: "relative" }}>
-      {/* Action Buttons */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5rem",
-          alignItems: "flex-start",
-        }}
-      >
+    <div className={styles.menuWrapper}>
+      <div className={styles.buttonColumn}>
         {/* Attack */}
         <button
-          style={buttonStyle}
+          className={styles.actionButton}
           onClick={() => onUse({ id: "attack-basic", name: "Attack" })}
         >
           Attack
@@ -71,32 +57,19 @@ export default function ActionMenu({
         {/* Skills */}
         <div style={{ position: "relative", display: "flex" }}>
           <button
-            style={{
-              ...buttonStyle,
-              backgroundColor: armorSkills.length > 0 ? "#eee" : "#666",
-              cursor: armorSkills.length > 0 ? "pointer" : "not-allowed",
-            }}
+            className={`${styles.actionButton} ${armorSkills.length === 0 ? styles.disabledButton : ""
+              }`}
             disabled={armorSkills.length === 0}
             onClick={() => armorSkills.length > 0 && toggleMenu("Skills")}
           >
             Skills
           </button>
           {activeMenu === "Skills" && (
-            <div
-              style={{
-                position: "absolute",
-                left: "100%",
-                top: 0,
-                background: "white",
-                border: "1px solid black",
-                padding: "0.5rem",
-                minWidth: buttonStyle.width,
-              }}
-            >
+            <div className={styles.dropdownContainer}>
               {armorSkills.map((skill) => (
                 <button
                   key={skill.id}
-                  style={{ ...buttonStyle, marginBottom: "0.25rem" }}
+                  className={styles.actionButton}
                   onClick={() => onUse(skill)}
                 >
                   {skill.name}
@@ -110,24 +83,18 @@ export default function ActionMenu({
         {(Object.entries(MENU_LABELS) as [ContentType, string][]).map(
           ([type, label]) => (
             <div key={label} style={{ position: "relative", display: "flex" }}>
-              <button style={buttonStyle} onClick={() => toggleMenu(label)}>
+              <button
+                className={styles.actionButton}
+                onClick={() => toggleMenu(label)}
+              >
                 {label}
               </button>
 
               <div
+                className={styles.dropdownContainer}
                 style={{
-                  position: "absolute",
-                  left: "100%",
-                  top: 0,
-                  background: "white",
-                  border: "1px solid black",
-                  padding: "0.5rem",
-                  minWidth: buttonStyle.width,
-                  boxShadow: "2px 2px 6px rgba(0,0,0,0.2)",
-                  transform:
-                    activeMenu === label ? "translateX(0)" : "translateX(-10px)",
+                  transform: activeMenu === label ? "translateX(0)" : "translateX(-10px)",
                   opacity: activeMenu === label ? 1 : 0,
-                  transition: "all 0.2s ease",
                   pointerEvents: activeMenu === label ? "auto" : "none",
                 }}
               >
@@ -142,10 +109,16 @@ export default function ActionMenu({
                     type === "Shield" ||
                     type === "Pet";
 
+                  const isEquipped =
+                    (type === "Weapon" && player.gearView.Weapons[0] === item.id) ||
+                    (type === "Armor" && player.gearView.Armor[0] === item.id) ||
+                    (type === "Shield" && player.gearView.Shields[0] === item.id) ||
+                    (type === "Pet" && player.gearView.Pet[0] === item.id);
+
                   return (
                     <button
                       key={item.id}
-                      style={{ ...buttonStyle, marginBottom: "0.25rem" }}
+                      className={styles.actionButton}
                       onMouseEnter={() => setHoveredItem(item)}
                       onMouseLeave={() => setHoveredItem(null)}
                       onClick={() => {
@@ -158,12 +131,7 @@ export default function ActionMenu({
                       }}
                     >
                       {item.name}
-                      {isEquippable &&
-                        ((type === "Weapon" && player.gearView.Weapons[0] === item.id) ||
-                          (type === "Armor" && player.gearView.Armor[0] === item.id) ||
-                          (type === "Shield" && player.gearView.Shields[0] === item.id) ||
-                          (type === "Pet" && player.gearView.Pet[0] === item.id)) &&
-                        " (Equipped)"}
+                      {isEquipped && <span className={styles.equipped}> (Equipped)</span>}
                     </button>
                   );
                 })}
@@ -174,23 +142,13 @@ export default function ActionMenu({
 
         {/* Run */}
         <div style={{ position: "relative", display: "flex" }}>
-          <button style={buttonStyle} onClick={() => toggleMenu("Run")}>
+          <button className={styles.actionButton} onClick={() => toggleMenu("Run")}>
             Run
           </button>
           {activeMenu === "Run" && (
-            <div
-              style={{
-                position: "absolute",
-                left: "100%",
-                top: 0,
-                background: "white",
-                border: "1px solid black",
-                padding: "0.5rem",
-                minWidth: buttonStyle.width,
-              }}
-            >
+            <div className={styles.dropdownContainer}>
               <button
-                style={buttonStyle}
+                className={styles.actionButton}
                 onClick={() => onUse({ id: "run", name: "Run" })}
               >
                 Confirm Run {runCost ? `(Cost: ${runCost} SP)` : ""}
@@ -200,12 +158,12 @@ export default function ActionMenu({
         </div>
       </div>
 
-      {/* Overlayed Preview (fixed right) */}
+      {/* ItemDetails Preview */}
       {hoveredItem && (
         <div
           style={{
             position: "absolute",
-            left: "230%", // ✅ moves panel away from menu
+            left: "230%",
             top: 0,
             width: "350px",
             zIndex: 10,

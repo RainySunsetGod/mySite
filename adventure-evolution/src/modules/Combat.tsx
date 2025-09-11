@@ -7,6 +7,7 @@ import { getTop8ByCategory } from "../utils/inventory";
 import { getContent } from "../data/library";
 import type { ContentItem } from "../data/library/types";
 import type { Element } from "../modules/elements";
+import styles from "./Combat.module.css";
 
 function checkLevelUp(player: Player): Player {
   const xpNeeded = player.level * 100;
@@ -184,14 +185,12 @@ export default function Combat({
 
       if (outcome.wasCrit) {
         pushLog(
-          `❗ ${enemy.name} critically hits you for ${outcome.damage} ${
-            attackElement ?? ""
+          `❗ ${enemy.name} critically hits you for ${outcome.damage} ${attackElement ?? ""
           } damage!`
         );
       } else {
         pushLog(
-          `${enemy.name} hits you for ${outcome.damage} ${
-            attackElement ?? ""
+          `${enemy.name} hits you for ${outcome.damage} ${attackElement ?? ""
           } damage.`
         );
       }
@@ -263,7 +262,24 @@ export default function Combat({
           Enemy is taking their turn...
         </p>
       ) : (
-        <button onClick={onExitCombat}>Return to Town</button>
+        <button
+          className={styles.returnButton}
+          onClick={() => {
+            // Fully heal the player (HP/MP)
+            const maxStats = calculateStats(player);
+            const updatedPlayer: Player = {
+              ...player,
+              currentHp: maxStats.hp,
+              currentMp: maxStats.mp,
+              currentSp: 0, // Lose all SP
+            };
+
+            setPlayer(updatedPlayer);
+            onExitCombat();
+          }}
+        >
+          Return to Town
+        </button>
       )}
 
       {/* Combat log */}
