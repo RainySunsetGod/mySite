@@ -17,6 +17,7 @@ export function spawnEnemy(template: EnemyTemplate, playerLevel: number): Combat
   return {
     id: `${template.id}_lv${chosen.level}`,
     name: template.name,
+    element: template.element,
     level: chosen.level,
     stats: chosen.stats,
     gold: chosen.gold,

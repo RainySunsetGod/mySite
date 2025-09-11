@@ -26,6 +26,7 @@ type Entity = {
   gold?: number;
   experience?: number;
   resistances?: Partial<Record<Element, number>>;
+  element?: Element;
 };
 
 type Props = {
@@ -84,6 +85,13 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         <div style={{ marginBottom: "0.5rem" }}>
           <h2 style={{ margin: 0 }}>{entity.name}</h2>
           <p style={{ margin: 0 }}>Level {entity.level}</p>
+
+          {/* ✅ Show inherent element if enemy */}
+          {!isLeft && "element" in entity && entity.element && (
+            <p style={{ margin: 0, color: ELEMENT_DETAILS[entity.element].color }}>
+              Element: {ELEMENT_DETAILS[entity.element].label}
+            </p>
+          )}
 
           {/* ✅ Player: current gold + exp progress */}
           {isLeft && (
