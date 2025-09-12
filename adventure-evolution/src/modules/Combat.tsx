@@ -33,6 +33,17 @@ function checkLevelUp(player: Player): Player {
 }
 
 type Turn = "player" | "enemy";
+type BattleResult = "win" | "loss" | null;
+
+type DamagePopup = {
+  id: number;
+  side: "player" | "enemy";
+  value?: number;
+  type: string;
+  element?: string;
+  crit?: boolean;
+  miss?: boolean;
+};
 
 type Props = {
   player: Player;
@@ -42,6 +53,8 @@ type Props = {
   onExitCombat: () => void;
 };
 
+let popupId = 0;
+
 export default function Combat({
   player,
   setPlayer,
@@ -50,32 +63,42 @@ export default function Combat({
   onExitCombat,
 }: Props) {
   const [turn, setTurn] = useState<Turn>("player");
-  const [log, setLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
-  const [battleResult, setBattleResult] = useState<"win" | "loss" | null>(null);
+  const [battleResult, setBattleResult] = useState<BattleResult>(null);
+  const [popups, setPopups] = useState<DamagePopup[]>([]);
+  const [actionLocked, setActionLocked] = useState(false);
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
   const top8 = getTop8ByCategory(player);
 
-  const pushLog = (msg: string) =>
-    setLog((prev) => [...prev, msg].slice(-10));
+  const showPopup = (
+    side: "player" | "enemy",
+    value?: number,
+    type: string = "",
+    element?: string,
+    crit?: boolean,
+    miss?: boolean
+  ) => {
+    const id = popupId++;
+    setPopups((prev) => [...prev, { id, side, value, type, element, crit, miss }]);
+
+    setTimeout(() => {
+      setPopups((prev) => prev.filter((p) => p.id !== id));
+    }, 1500);
+  };
 
   const regenSp = () => {
     setPlayer((prev) => {
       const spRegen = 2 + Math.floor(prev.stats.END / 5);
       const maxSp = calculateStats(prev).sp;
       const newSp = Math.min(prev.currentSp + spRegen, maxSp);
-
-      if (newSp !== prev.currentSp) {
-        pushLog(`You regained ${newSp - prev.currentSp} SP.`);
-        return { ...prev, currentSp: newSp };
-      }
-      return prev;
+      return { ...prev, currentSp: newSp };
     });
   };
 
   const playerAttack = () => {
-    if (turn !== "player" || battleOver) return;
+    if (turn !== "player" || battleOver || actionLocked) return;
+    setActionLocked(true);
 
     const weaponId = player.gearView.Weapons?.[0] ?? null;
     const playerWeapon: ContentItem | null = weaponId
@@ -98,67 +121,51 @@ export default function Combat({
     );
 
     if (!outcome.hit) {
-      pushLog(`You missed the ${enemy.name}!`);
+      showPopup("enemy", undefined, "Miss", undefined, false, true);
     } else {
+      const damage = outcome.damage;
+
       setEnemy((prev) => ({
         ...prev,
-        currentHp: Math.max(0, prev.currentHp - outcome.damage),
+        currentHp: Math.max(0, prev.currentHp - damage),
       }));
 
-      if (outcome.wasCrit) {
-        pushLog(`💥 Critical hit! You dealt ${outcome.damage} damage!`);
-      } else {
-        pushLog(`You hit the ${enemy.name} for ${outcome.damage} damage.`);
+      showPopup(
+        "enemy",
+        damage,
+        playerWeapon?.attackType ?? "melee",
+        playerWeapon?.element,
+        outcome.wasCrit
+      );
+
+      if (enemy.currentHp - damage <= 0) {
+        const goldReward = enemy.gold ?? 0;
+        const xpReward = enemy.experience ?? 0;
+
+        setPlayer((p) => {
+          const updated = {
+            ...p,
+            gold: p.gold + goldReward,
+            experience: p.experience + xpReward,
+          };
+          return checkLevelUp(updated);
+        });
+
+        setBattleOver(true);
+        setBattleResult("win");
       }
     }
 
-    pushLog(
-      `🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
-    );
-    if (playerWeapon) {
-      pushLog(`⚔️ Weapon: ${playerWeapon.name}`);
+    setActionLocked(false);
+    if (!battleOver) {
+      setTurn("enemy");
+      setTimeout(enemyTurn, 1000);
     }
-    if (playerWeapon?.element) {
-      pushLog(`🌟 Element: ${playerWeapon.element}`);
-    }
-    outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
-
-    if (enemy.currentHp - outcome.damage <= 0) {
-      pushLog(`✅ You defeated the ${enemy.name}!`);
-
-      const goldReward = enemy.gold ?? 0;
-      const xpReward = enemy.experience ?? 0;
-
-      setPlayer((prev) => {
-        const updated = {
-          ...prev,
-          gold: prev.gold + goldReward,
-          experience: prev.experience + xpReward,
-        };
-
-        const leveled = checkLevelUp(updated);
-
-        if (goldReward > 0) pushLog(`💰 You gained ${goldReward} gold!`);
-        if (xpReward > 0) pushLog(`⭐ You gained ${xpReward} experience!`);
-
-        if (leveled.level > prev.level) {
-          pushLog(`⬆️ You leveled up to level ${leveled.level}!`);
-        }
-
-        return leveled;
-      });
-
-      setBattleOver(true);
-      setBattleResult("win");
-      return;
-    }
-
-    setTurn("enemy");
-    setTimeout(enemyTurn, 1000);
   };
 
   const enemyTurn = () => {
-    if (battleOver) return;
+    if (battleOver || actionLocked) return;
+    setActionLocked(true);
 
     const attackType = enemy.attackType ?? "melee";
     const attackElement = enemy.element;
@@ -178,57 +185,39 @@ export default function Combat({
     );
 
     if (!outcome.hit) {
-      pushLog(`${enemy.name} missed!`);
+      showPopup("player", undefined, "Miss", undefined, false, true);
     } else {
+      const damage = outcome.damage;
+
       setPlayer((prev) => ({
         ...prev,
-        currentHp: Math.max(0, prev.currentHp - outcome.damage),
+        currentHp: Math.max(0, prev.currentHp - damage),
       }));
 
-      if (outcome.wasCrit) {
-        pushLog(
-          `❗ ${enemy.name} critically hits you for ${outcome.damage} ${attackElement ?? ""
-          } damage!`
-        );
-      } else {
-        pushLog(
-          `${enemy.name} hits you for ${outcome.damage} ${attackElement ?? ""
-          } damage.`
-        );
+      showPopup("player", damage, attackType, attackElement, outcome.wasCrit);
+
+      if (player.currentHp - damage <= 0) {
+        setBattleOver(true);
+        setBattleResult("loss");
       }
     }
 
-    pushLog(
-      `🎯 Hit chance: ${outcome.hitChance.toFixed(1)}% (rolled ${outcome.roll.toFixed(1)})`
-    );
-    if (attackElement) {
-      pushLog(`🌟 Element: ${attackElement}`);
+    setActionLocked(false);
+    if (!battleOver) {
+      regenSp();
+      setTurn("player");
     }
-    outcome.debug.forEach((d) => pushLog(`ℹ️ ${d}`));
-
-    if (player.currentHp - outcome.damage <= 0) {
-      pushLog(`💀 You were defeated by the ${enemy.name}...`);
-      setBattleOver(true);
-      setBattleResult("loss");
-      return;
-    }
-
-    regenSp();
-    setTurn("player");
   };
 
   const handleRun = () => {
     if (player.currentSp < runCost) {
-      pushLog(
-        `Not enough SP to run! Need ${runCost}, you have ${player.currentSp}.`
-      );
+      showPopup("player", 0, "Run Failed");
       return;
     }
 
     setPlayer((prev) => ({ ...prev, currentSp: prev.currentSp - runCost }));
-    pushLog(`You spend ${runCost} SP and escape from battle!`);
     setBattleOver(true);
-    setBattleResult("loss"); // treat fleeing as a loss
+    setBattleResult("loss");
   };
 
   return (
@@ -242,8 +231,26 @@ export default function Combat({
         alignItems: "center",
         justifyContent: "flex-end",
         paddingBottom: "2rem",
+        position: "relative",
       }}
     >
+      {/* Floating damage popups */}
+      {popups.map((popup) => (
+        <div
+          key={popup.id}
+          className={`${styles.damagePopup} ${styles[popup.side]} ${popup.crit ? styles.crit : ""
+            } ${popup.miss ? styles.miss : ""}`}
+        >
+          {popup.miss ? (
+            <span>Miss</span>
+          ) : (
+            <span>
+              {popup.value} {popup.type} {popup.element ?? ""}
+            </span>
+          )}
+        </div>
+      ))}
+
       {!battleOver && turn === "player" ? (
         <ActionMenu
           player={player}
@@ -256,8 +263,6 @@ export default function Combat({
               playerAttack();
             } else if (item.id === "run") {
               handleRun();
-            } else {
-              pushLog(`You used ${item.name}, but nothing happened yet.`);
             }
           }}
         />
@@ -270,7 +275,6 @@ export default function Combat({
           className={styles.returnButton}
           onClick={() => {
             const maxStats = calculateStats(player);
-
             let updatedPlayer: Player = player;
 
             if (battleResult === "loss") {
@@ -296,22 +300,6 @@ export default function Combat({
           Return to Town
         </button>
       )}
-
-      {/* Combat log */}
-      <div
-        style={{
-          marginTop: "1rem",
-          width: "50%",
-          minHeight: "5rem",
-          border: "1px solid #ccc",
-          padding: "0.5rem",
-          fontSize: "0.9rem",
-        }}
-      >
-        {log.map((entry, i) => (
-          <div key={i}>{entry}</div>
-        ))}
-      </div>
     </div>
   );
 }
