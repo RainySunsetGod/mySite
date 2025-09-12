@@ -52,6 +52,7 @@ export default function Combat({
   const [turn, setTurn] = useState<Turn>("player");
   const [log, setLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
+  const [battleResult, setBattleResult] = useState<"win" | "loss" | null>(null);
 
   const runCost = Math.ceil(enemy.level * 2 + enemy.stats.DEX);
   const top8 = getTop8ByCategory(player);
@@ -93,7 +94,7 @@ export default function Combat({
         resistances: enemy.resistances,
       },
       playerWeapon?.attackType ?? "melee",
-      playerWeapon?.element as Element | undefined // ✅ if weapon has an element
+      playerWeapon?.element as Element | undefined
     );
 
     if (!outcome.hit) {
@@ -148,6 +149,7 @@ export default function Combat({
       });
 
       setBattleOver(true);
+      setBattleResult("win");
       return;
     }
 
@@ -158,8 +160,8 @@ export default function Combat({
   const enemyTurn = () => {
     if (battleOver) return;
 
-    const attackType = enemy.attackType ?? "melee"; // ✅ support attackType
-    const attackElement = enemy.element; // ✅ general element of attacks
+    const attackType = enemy.attackType ?? "melee";
+    const attackElement = enemy.element;
 
     const outcome = calculateDamageOutcome(
       {
@@ -207,6 +209,7 @@ export default function Combat({
     if (player.currentHp - outcome.damage <= 0) {
       pushLog(`💀 You were defeated by the ${enemy.name}...`);
       setBattleOver(true);
+      setBattleResult("loss");
       return;
     }
 
@@ -225,6 +228,7 @@ export default function Combat({
     setPlayer((prev) => ({ ...prev, currentSp: prev.currentSp - runCost }));
     pushLog(`You spend ${runCost} SP and escape from battle!`);
     setBattleOver(true);
+    setBattleResult("loss"); // treat fleeing as a loss
   };
 
   return (
@@ -265,14 +269,25 @@ export default function Combat({
         <button
           className={styles.returnButton}
           onClick={() => {
-            // Fully heal the player (HP/MP)
             const maxStats = calculateStats(player);
-            const updatedPlayer: Player = {
-              ...player,
-              currentHp: maxStats.hp,
-              currentMp: maxStats.mp,
-              currentSp: 0, // Lose all SP
-            };
+
+            let updatedPlayer: Player = player;
+
+            if (battleResult === "loss") {
+              updatedPlayer = {
+                ...player,
+                currentHp: maxStats.hp,
+                currentMp: maxStats.mp,
+                currentSp: 0,
+              };
+            } else if (battleResult === "win") {
+              updatedPlayer = {
+                ...player,
+                currentHp: Math.min(player.currentHp, maxStats.hp),
+                currentMp: Math.min(player.currentMp, maxStats.mp),
+                currentSp: player.currentSp,
+              };
+            }
 
             setPlayer(updatedPlayer);
             onExitCombat();
@@ -291,7 +306,6 @@ export default function Combat({
           border: "1px solid #ccc",
           padding: "0.5rem",
           fontSize: "0.9rem",
-          // background: "rgba(255,255,255,0.8)",
         }}
       >
         {log.map((entry, i) => (
