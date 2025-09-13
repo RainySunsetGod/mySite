@@ -1,63 +1,58 @@
-html,
-body,
-#root {
-  height: 100%;
+/* === GLOBAL NEON FANTASY THEME === */
+
+/* Background */
+body {
   margin: 0;
-  padding: 0;
-  background-color: #0d0d1f;
-  /* dark fantasy base */
-  font-family: 'Orbitron', sans-serif;
-  /* futuristic font */
-  color: #d0ffe4;
-  /* soft tech-green */
+  font-family: 'Cinzel', serif; /* works great for fantasy */
+  background: radial-gradient(circle at top, #1a001f, #0b0012);
+  color: #e0d6ff;
+  text-shadow: 0 0 6px #a855f7, 0 0 12px #7c3aed;
 }
 
-h1,
-h2,
-h3 {
-  color: #00fff2;
-  text-shadow: 0 0 6px #00fff2, 0 0 12px #007a78;
+/* Headings */
+h1, h2, h3 {
+  color: #d8b4fe;
+  text-shadow: 0 0 10px #9333ea, 0 0 20px #7c3aed;
+  letter-spacing: 1px;
 }
 
+/* Flickering magical neon effect */
+.neon-flicker {
+  animation: flicker 2.5s infinite alternate;
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow: 0 0 4px #fff, 0 0 10px #a855f7, 0 0 20px #9333ea;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
+
+/* Buttons */
 button {
-  background: linear-gradient(90deg, #ff00e0, #00ffee);
-  color: #0d0d1f;
-  border: none;
-  padding: 0.5rem 1.25rem;
+  background: linear-gradient(145deg, #4c1d95, #6d28d9);
+  color: #f5f3ff;
+  border: 2px solid #c084fc;
   border-radius: 8px;
-  font-weight: bold;
-  box-shadow: 0 0 6px #00ffee;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
+  text-shadow: 0 0 5px #c084fc;
 }
 
 button:hover {
-  box-shadow: 0 0 12px #00ffee, 0 0 24px #ff00e0;
-  transform: scale(1.05);
+  background: linear-gradient(145deg, #7c3aed, #a855f7);
+  box-shadow: 0 0 12px #a855f7, 0 0 24px #9333ea;
 }
 
-
-@keyframes flicker {
-
-  0%,
-  19%,
-  21%,
-  23%,
-  25%,
-  54%,
-  56%,
-  100% {
-    opacity: 1;
-  }
-
-  20%,
-  22%,
-  24%,
-  55% {
-    opacity: 0.3;
-  }
-}
-
-.neon-flicker {
-  animation: flicker 2s infinite;
+/* Panels (shop, trainer, inventory) */
+.panel {
+  background: rgba(25, 0, 40, 0.85);
+  border: 2px solid #9333ea;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 12px #7c3aed, inset 0 0 8px #a855f7;
 }

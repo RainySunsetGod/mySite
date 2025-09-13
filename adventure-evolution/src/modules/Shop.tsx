@@ -3,7 +3,8 @@ import { getContent } from "../data/library";
 import type { Player } from "../state/player";
 import type { ContentType, ContentItem } from "../data/library/types";
 import { saveProgress } from "../utils/game";
-import ItemDetails from "../components/ItemDetails"; // ✅ new shared component
+import ItemDetails from "../components/ItemDetails";
+import styles from "./Shop.module.css"; // ✅ import new CSS
 
 type Props = {
   player: Player;
@@ -44,33 +45,20 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
   };
 
   return (
-    <div style={{ display: "flex", padding: "2rem", gap: "2rem" }}>
+    <div className={styles.container}>
       {/* Left: Shop List */}
-      <div style={{ flex: 1, textAlign: "center" }}>
-        <h2 className="neon-flicker">{shopName}</h2>
+      <div className={styles.leftPanel}>
+        <h2 className={`${styles.title} neon-flicker`}>{shopName}</h2>
 
         {/* Category Tabs */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "1rem",
-            gap: "0.5rem",
-          }}
-        >
+        <div className={styles.tabs}>
           {Object.entries(TYPE_ICONS).map(([type, icon]) => (
             <button
               key={type}
               onClick={() => setActiveType(type as ContentType)}
-              style={{
-                // width: "48px",
-                // height: "48px",
-                fontSize: "1.5rem",
-                backgroundColor: type === activeType ? "#ffcc00" : "#ff00c833",
-                border: "2px solid #555",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
+              className={`${styles.tabButton} ${
+                activeType === type ? styles.tabButtonActive : ""
+              }`}
               title={type}
             >
               {icon}
@@ -79,17 +67,7 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
         </div>
 
         {/* Shop Items */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            maxHeight: "400px",
-            overflowY: "auto",
-            padding: "0.5rem",
-          }}
-        >
+        <div className={styles.itemList}>
           {filteredStock.length === 0 ? (
             <p>No {activeType.toLowerCase()}s for sale.</p>
           ) : (
@@ -97,22 +75,9 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                style={{
-                  width: "260px",
-                  padding: "0.75rem",
-                  border: "2px solid #444",
-                  borderRadius: "6px",
-                  backgroundColor: player.inventory.includes(item.id)
-                    ? "#777"
-                    : "#1976d2",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: "0.85rem",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
+                className={`${styles.item} ${
+                  player.inventory.includes(item.id) ? styles.itemOwned : ""
+                }`}
               >
                 <span>{item.name}</span>
                 <button
@@ -121,19 +86,7 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
                     buyItem(item.id);
                   }}
                   disabled={player.inventory.includes(item.id)}
-                  style={{
-                    marginLeft: "0.5rem",
-                    backgroundColor: player.inventory.includes(item.id)
-                      ? "#555"
-                      : "#4caf50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    padding: "0.25rem 0.5rem",
-                    cursor: player.inventory.includes(item.id)
-                      ? "not-allowed"
-                      : "pointer",
-                  }}
+                  className={styles.buyButton}
                 >
                   {player.inventory.includes(item.id) ? "Owned" : "Buy"}
                 </button>
@@ -142,10 +95,7 @@ export default function Shop({ player, setPlayer, shopName, stock, onExit }: Pro
           )}
         </div>
 
-        <button
-          onClick={onExit}
-          style={{ marginTop: "2rem", padding: "0.5rem 1.25rem" }}
-        >
+        <button onClick={onExit} className={styles.leaveButton}>
           Leave Shop
         </button>
       </div>

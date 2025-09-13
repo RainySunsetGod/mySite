@@ -35,20 +35,16 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
     const filteredIds = filteredItems.map((i) => i.id);
     const indexInFiltered = filteredIds.findIndex((id) => id === itemId);
     const newIndexInFiltered = indexInFiltered + direction;
-
     if (newIndexInFiltered < 0 || newIndexInFiltered >= filteredIds.length) return;
 
     const idA = filteredIds[indexInFiltered];
     const idB = filteredIds[newIndexInFiltered];
-
     const indexA = player.inventory.findIndex((id) => id === idA);
     const indexB = player.inventory.findIndex((id) => id === idB);
-
     if (indexA === -1 || indexB === -1) return;
 
     const updated = [...player.inventory];
     [updated[indexA], updated[indexB]] = [updated[indexB], updated[indexA]];
-
     setPlayer({ ...player, inventory: updated });
   };
 
@@ -58,12 +54,10 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
     const filteredIds = filteredItems.map((i) => i.id);
     const draggedIndex = filteredIds.indexOf(draggedId);
     const targetIndex = filteredIds.indexOf(targetId);
-
     if (draggedIndex === -1 || targetIndex === -1) return;
 
     const draggedFullIndex = player.inventory.findIndex((id) => id === draggedId);
     const targetFullIndex = player.inventory.findIndex((id) => id === targetId);
-
     if (draggedFullIndex === -1 || targetFullIndex === -1) return;
 
     const updated = [...player.inventory];
@@ -75,16 +69,18 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.leftPane}>
-        <h2 className={`${styles.title} neon-flicker`}>Inventory</h2>
+    <div className={styles.inventoryContainer}>
+      {/* Left: Inventory */}
+      <div className={styles.inventoryPanel}>
+        <h2 className="neon-flicker">Inventory</h2>
 
-        <div className={styles.categoryBar}>
+        {/* Category Icons */}
+        <div className={styles.categoryIcons}>
           {Object.entries(TYPE_ICONS).map(([type, icon]) => (
             <button
               key={type}
               onClick={() => setActiveType(type as ContentType)}
-              className={`${styles.categoryButton} ${activeType === type ? styles.categoryButtonActive : ""}`}
+              className={`${styles.categoryButton} ${type === activeType ? styles.active : ""}`}
               title={type}
             >
               {icon}
@@ -92,6 +88,7 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
           ))}
         </div>
 
+        {/* Inventory List */}
         <div className={styles.inventoryList}>
           {filteredItems.length === 0 ? (
             <p>No items in this category.</p>
@@ -104,10 +101,11 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => handleDrop(item.id)}
                 onClick={() => setSelectedItem(item)}
-                className={`${styles.itemCard} ${draggedId === item.id ? styles.dragging : ""}`}
+                className={`${styles.inventoryItem} ${draggedId === item.id ? styles.dragged : ""}`}
               >
-                <div className={styles.itemName}>{item.name}</div>
-                <div className={styles.arrowGroup}>
+                <div style={{ flex: 1, textAlign: "left" }}>{item.name}</div>
+
+                <div className={styles.moveButtons}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -132,13 +130,13 @@ export default function InventoryScreen({ player, onClose, setPlayer }: Props) {
           )}
         </div>
 
-        <button onClick={onClose} className={styles.closeButton}>
+        <button className={styles.closeButton} onClick={onClose}>
           Close
         </button>
       </div>
 
+      {/* Right: Item Details */}
       <ItemDetails item={selectedItem} />
     </div>
-
   );
 }

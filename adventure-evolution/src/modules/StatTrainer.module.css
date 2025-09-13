@@ -1,105 +1,96 @@
-/* StatTrainer.module.css */
-
 .container {
-    text-align: center;
-    padding-top: 2rem;
-    background: linear-gradient(160deg, #0d0d1f, #1c1c2b);
-    border: 2px solid #2affff33;
-    border-radius: 12px;
-    max-width: 600px;
-    margin: 0 auto;
-    box-shadow: 0 0 24px #00fff233;
-    padding-bottom: 2rem;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(30, 10, 40, 0.85);
+  border: 2px solid #7c3aed;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 0 24px #7c3aed, inset 0 0 12px #a855f7;
 }
 
 .title {
-    font-size: 2.2rem;
-    color: #7df9ff;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 6px #00fff2, 0 0 18px #007a78;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1px;
+  font-size: 2.2rem;
+  color: #c084fc;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px #c084fc, 0 0 20px #6d28d9;
+  font-family: 'Cinzel Decorative', serif;
 }
 
 .pointsLeft {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #39ff14;
-    margin-bottom: 2rem;
-    text-shadow: 0 0 2px #39ff14;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #22c55e;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 4px #22c55e;
 }
 
 .statRow {
-    margin: 0.75rem 0;
-    font-size: 1.1rem;
-    color: #e0f8ff;
-    text-shadow: 0 0 2px #ffffff33;
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
+  color: #f5f3ff;
+  text-shadow: 0 0 3px #c084fc;
 }
 
 .statRow button {
-    margin-left: 0.75rem;
-    padding: 0.3rem 0.8rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    background: #111;
-    border: 2px solid #00ffee;
-    color: #00ffee;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 6px #00ffee44;
+  margin-left: 0.75rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: rgba(147, 51, 234, 0.2);
+  border: 2px solid #c084fc;
+  color: #f5f3ff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 6px #c084fc55;
 }
 
 .statRow button:hover {
-    background: #00ffee33;
-    box-shadow: 0 0 12px #00ffee;
+  background: rgba(192, 132, 252, 0.4);
+  box-shadow: 0 0 12px #c084fc;
 }
 
 .actions {
-    margin-top: 2.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .actions button {
-    padding: 0.6rem 1.4rem;
-    font-size: 1rem;
-    border: 2px solid #ff00c8;
-    border-radius: 8px;
-    background-color: rgba(255, 0, 200, 0.15);
-    /* translucent magenta background */
-    color: #ffffff;
-    /* high contrast text */
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 0 0 2px #ff00c8, 0 0 4px #000;
-    box-shadow: 0 0 6px #ff00c855;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  border: 2px solid #ec4899;
+  border-radius: 8px;
+  background: rgba(236, 72, 153, 0.25);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 4px #ec4899;
+  box-shadow: 0 0 8px #ec4899;
 }
 
 .actions button:hover {
-    background-color: rgba(255, 0, 200, 0.35);
-    box-shadow: 0 0 12px #ff00c8, 0 0 24px #ff00c8;
+  background: rgba(236, 72, 153, 0.45);
+  box-shadow: 0 0 12px #ec4899, 0 0 24px #c084fc;
 }
 
-
 .resetButton {
-    border-color: #ff4444;
-    color: #ffffff;
-    background-color: rgba(255, 68, 68, 0.15);
-    text-shadow: 0 0 2px #ff4444, 0 0 4px #000;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.25);
+  text-shadow: 0 0 4px #ef4444;
 }
 
 .resetButton:hover {
-    background-color: rgba(255, 68, 68, 0.35);
-    box-shadow: 0 0 12px #ff4444, 0 0 20px #ff4444;
+  background: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 12px #ef4444, 0 0 20px #dc2626;
 }
 
-
 .actions button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }

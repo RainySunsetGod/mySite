@@ -1,127 +1,138 @@
-/* InventoryScreen.module.css */
-
-.container {
-    display: flex;
-    padding: 2rem;
-    gap: 2rem;
-    color: #d0ffe4;
+.inventoryContainer {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
 }
 
-.leftPane {
-    flex: 1;
-    text-align: center;
+.inventoryPanel {
+  flex: 1;
+  text-align: center;
+  background: rgba(30, 10, 40, 0.85);
+  border: 2px solid #7c3aed;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  box-shadow: 0 0 24px #7c3aed, inset 0 0 12px #a855f7;
 }
 
-.title {
-    font-size: 2rem;
-    color: #00fff2;
-    text-shadow: 0 0 6px #00fff2, 0 0 12px #007a78;
-    margin-bottom: 1rem;
+/* Title is provided by your h2 + optional .neon-flicker */
+
+.categoryIcons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem 0;
 }
 
-.categoryBar {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
+/* Category buttons styled like Stat Row buttons (purple border) */
 .categoryButton {
-    font-size: 1.5rem;
-    background-color: #222;
-    border: 2px solid #00ffee;
-    border-radius: 6px;
-    color: #00ffee;
-    cursor: pointer;
-    padding: 0.25rem 0.75rem;
-    transition: all 0.2s ease;
+  font-size: 1.5rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(147, 51, 234, 0.2);
+  border: 2px solid #c084fc;
+  color: #f5f3ff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 6px #c084fc55;
 }
 
-.categoryButtonActive {
-    background-color: #00ffee;
-    color: #0d0d1f;
-    box-shadow: 0 0 8px #00ffee, 0 0 16px #00ffee;
+.categoryButton:hover {
+  background: rgba(192, 132, 252, 0.4);
+  box-shadow: 0 0 12px #c084fc;
 }
 
+.active {
+  background: linear-gradient(145deg, rgba(192,132,252,0.35), rgba(147,51,234,0.35));
+  border-color: #c084fc;
+  box-shadow: 0 0 12px #c084fc;
+}
+
+/* List container */
 .inventoryList {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
 }
 
-.itemCard {
-    width: 260px;
-    padding: 0.75rem;
-    border: 2px solid #ff00c8;
-    border-radius: 6px;
-    background-color: #1c1c2b;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.85rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: grab;
-    transition: all 0.2s ease;
+/* Inventory item card */
+.inventoryItem {
+  width: 260px;
+  padding: 0.75rem;
+  border: 2px solid #7c3aed;
+  border-radius: 8px;
+  background: rgba(30, 10, 40, 0.9);
+  color: #f5f3ff;
+  font-weight: bold;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: grab;
+  box-shadow: inset 0 0 8px #a855f7;
 }
 
-.itemCard:hover {
-    box-shadow: 0 0 8px #ff00c8;
+.inventoryItem:hover {
+  background: rgba(147, 51, 234, 0.3);
+  box-shadow: 0 0 12px #7c3aed, inset 0 0 10px #a855f7;
 }
 
-.itemCard.dragging {
-    opacity: 0.6;
-    background-color: #330022;
+.dragged {
+  opacity: 0.6;
+  cursor: grabbing;
 }
 
-.itemName {
-    flex: 1;
-    text-align: left;
+/* Up/Down small buttons — styled like Stat Row buttons */
+.moveButtons button {
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: rgba(147, 51, 234, 0.2);
+  border: 2px solid #c084fc;
+  color: #f5f3ff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 6px #c084fc55;
 }
 
-.arrowGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+.moveButtons button:hover {
+  background: rgba(192, 132, 252, 0.4);
+  box-shadow: 0 0 12px #c084fc;
 }
 
-.arrowGroup button {
-    background: transparent;
-    color: #00ffee;
-    border: 1px solid #00ffee;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.moveButtons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.arrowGroup button:hover:not(:disabled) {
-    background-color: #00ffee33;
-    box-shadow: 0 0 6px #00ffee;
-}
-
-.arrowGroup button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
+/* Close button — styled like .actions button (pink border) */
 .closeButton {
-    margin-top: 2rem;
-    padding: 0.5rem 1.25rem;
-    background-color: transparent;
-    border: 2px solid #ff00c8;
-    color: #ff00c8;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
+  margin-top: 2rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  border: 2px solid #ec4899;
+  border-radius: 8px;
+  background: rgba(236, 72, 153, 0.25);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 4px #ec4899;
+  box-shadow: 0 0 8px #ec4899;
 }
 
 .closeButton:hover {
-    background-color: #ff00c833;
-    box-shadow: 0 0 10px #ff00c8;
+  background: rgba(236, 72, 153, 0.45);
+  box-shadow: 0 0 12px #ec4899, 0 0 24px #c084fc;
 }

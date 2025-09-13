@@ -1,28 +1,67 @@
-/* Combat.module.css */
+/* === COMBAT POPUPS AND RETURN BUTTON === */
 
+.damagePopup {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.4rem;
+  animation: rise 1.5s ease-out forwards;
+  color: #f0abfc;
+  text-shadow: 0 0 6px #f0abfc, 0 0 12px #e879f9;
+  pointer-events: none;
+}
+
+/* Side positioning */
+.damagePopup.enemy {
+  top: 30%;
+  right: 25%;
+}
+
+.damagePopup.player {
+  bottom: 30%;
+  left: 25%;
+}
+
+/* Critical hit style */
+.damagePopup.crit {
+  color: #f87171;
+  text-shadow: 0 0 8px #ef4444, 0 0 18px #dc2626;
+  font-size: 1.8rem;
+}
+
+/* Miss style */
+.damagePopup.miss {
+  color: #9ca3af;
+  text-shadow: 0 0 4px #6b7280;
+  font-style: italic;
+}
+
+/* Floating upward animation */
+@keyframes rise {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* Return button after battle */
 .returnButton {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
-    border: 2px solid #ff00c8;
-    border-radius: 10px;
-    background-color: rgba(255, 0, 200, 0.15);
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: 0 0 2px #ff00c8, 0 0 4px #000;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    margin-top: 1rem;
-    box-shadow: 0 0 6px #ff00c855;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(145deg, #4c1d95, #6d28d9);
+  color: #f5f3ff;
+  border: 2px solid #c084fc;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  text-shadow: 0 0 5px #c084fc;
+  transition: all 0.2s ease-in-out;
 }
 
 .returnButton:hover {
-    background-color: rgba(255, 0, 200, 0.35);
-    box-shadow: 0 0 12px #ff00c8, 0 0 24px #ff00c8;
-    transform: scale(1.05);
-}
-
-.damagePopup.miss {
-    color: #aaa;
-    font-size: 1.5rem;
-    text-shadow: 0 0 5px #000, 0 0 8px #444;
+  background: linear-gradient(145deg, #7c3aed, #a855f7);
+  box-shadow: 0 0 15px #a855f7, 0 0 25px #9333ea;
 }
