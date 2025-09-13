@@ -244,10 +244,15 @@ export default function Combat({
           {popup.miss ? (
             <span>Miss</span>
           ) : (
-            <span>
-              {popup.value} {popup.type} {popup.element ?? ""}
-            </span>
+            <>
+              {popup.element && (
+                <div style={{ fontSize: "0.8rem", opacity: 0.9 }}>{popup.element}</div>
+              )}
+              <div style={{ fontSize: "0.9rem" }}>{popup.type}</div>
+              <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>{popup.value}</div>
+            </>
           )}
+
         </div>
       ))}
 

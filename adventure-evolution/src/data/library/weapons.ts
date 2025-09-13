@@ -6,6 +6,7 @@ export const WEAPONS: ContentItem[] = [
     name: "Iron Sword",
     type: "Weapon",
     attackType: "melee",
+    element: "Earth",
     accuracy: 95,
     evolution: {
       requirements: [{ type: "merge", count: 2 }],
