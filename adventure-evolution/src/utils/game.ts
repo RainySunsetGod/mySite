@@ -5,11 +5,15 @@ export function fullHeal(player: Player): Player {
   const stats = calculateStats(player);
   return {
     ...player,
+    maxHp: stats.hp,
+    maxMp: stats.mp,
+    maxSp: stats.sp,
     currentHp: stats.hp,
     currentMp: stats.mp,
-    // 🔹 SP NOT reset, stamina is an economy
+    currentSp: player.currentSp,
   };
 }
+
 
 export function saveProgress(player: Player) {
   localStorage.setItem("playerData", JSON.stringify(player));
