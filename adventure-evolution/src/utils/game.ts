@@ -14,7 +14,6 @@ export function fullHeal(player: Player): Player {
   };
 }
 
-
 export function saveProgress(player: Player) {
   localStorage.setItem("playerData", JSON.stringify(player));
 }
