@@ -90,7 +90,76 @@ export function calculateDamageOutcome(
 
   const debug: string[] = [];
 
-  // === Accuracy Calculation ===
+  let baseDamage = 0;
+
+  if (weapon?.damage) {
+    // Weapon with min–max
+    const min = weapon.damage.min;
+    const max = weapon.damage.max;
+    baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
+    debug.push(`Rolled weapon damage: ${baseDamage} (${min}-${max})`);
+  } else {
+    // Stat-based "default" attack → generate min–max range
+    let min = 0;
+    let max = 0;
+
+    switch (type) {
+      case "melee":
+        min = Math.floor(atkStats.STR * 1.2 + atkLevel * 0.8);
+        max = Math.floor(atkStats.STR * 1.8 + atkLevel * 1.2);
+        break;
+      case "ranged":
+        min = Math.floor(atkStats.DEX * 1.2 + atkLevel * 0.8);
+        max = Math.floor(atkStats.DEX * 1.8 + atkLevel * 1.2);
+        break;
+      case "magic":
+        min = Math.floor(atkStats.INT * 1.2 + atkLevel * 0.8);
+        max = Math.floor(atkStats.INT * 1.8 + atkLevel * 1.2);
+        break;
+    }
+
+    baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
+    debug.push(`Stat-based damage roll: ${baseDamage} (${min}-${max})`);
+  }
+
+  let critChance = 10 + atkStats.LUK * 0.5 + atkStats.DEX * 0.2; // base + stats
+  if (weapon?.critBonus !== undefined) {
+    critChance += weapon.critBonus;
+    debug.push(`Weapon crit bonus applied: +${weapon.critBonus}`);
+  }
+
+  const critRoll = Math.random() * 100;
+  const wasCrit = critRoll < critChance;
+
+  if (wasCrit) {
+    const critDamage = Math.floor(baseDamage * 2); // AQ = double damage
+    debug.push(
+      `Critical hit! Auto-hit. Roll: ${critRoll.toFixed(1)} < ${critChance.toFixed(1)}`
+    );
+
+    let finalDamage = critDamage;
+
+    // Apply Elemental Resistance
+    if (element && resistances) {
+      const res = resistances[element] ?? 100;
+      const adjusted = Math.floor((finalDamage * res) / 100);
+      debug.push(
+        `Elemental check: ${element}, resistance ${res}%. Damage adjusted from ${finalDamage} → ${adjusted}`
+      );
+      finalDamage = Math.max(1, adjusted);
+    }
+
+    return {
+      hit: true,
+      damage: finalDamage,
+      wasCrit: true,
+      hitChance: 100, // crits always hit
+      roll: critRoll,
+      debug,
+    };
+  }
+
+  // === Accuracy Check (only for non-crits) ===
   const mainStat = getMainStatForType(type, atkStats);
   let accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
 
@@ -119,45 +188,6 @@ export function calculateDamageOutcome(
     };
   }
 
-  // === Damage Calculation ===
-  let baseDamage = 0;
-  if (weapon?.damage) {
-    const min = weapon.damage.min;
-    const max = weapon.damage.max;
-    baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
-    debug.push(`Rolled weapon damage: ${baseDamage} (${min}-${max})`);
-  } else {
-    switch (type) {
-      case "melee":
-        baseDamage = atkStats.STR * 1.5 + atkLevel;
-        break;
-      case "ranged":
-        baseDamage = atkStats.DEX * 1.5 + atkLevel;
-        break;
-      case "magic":
-        baseDamage = atkStats.INT * 1.5 + atkLevel;
-        break;
-    }
-    debug.push(`Base stat damage: ${baseDamage}`);
-  }
-
-  // === Critical Check ===
-  let critChance = atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
-  if (weapon?.critBonus !== undefined) {
-    critChance += weapon.critBonus;
-    debug.push(`Weapon crit bonus applied: +${weapon.critBonus}`);
-  }
-
-  const critRoll = Math.random() * 100;
-  const wasCrit = critRoll < critChance;
-
-  if (wasCrit) {
-    baseDamage = Math.floor(baseDamage * 1.5);
-    debug.push(`Critical hit! Roll: ${critRoll.toFixed(1)} < ${critChance.toFixed(1)}`);
-  } else {
-    debug.push(`No crit. Roll: ${critRoll.toFixed(1)} vs ${critChance.toFixed(1)}`);
-  }
-
   // === Apply Elemental Resistance ===
   let finalDamage = Math.max(1, Math.round(baseDamage));
 
@@ -175,7 +205,7 @@ export function calculateDamageOutcome(
   return {
     hit: true,
     damage: finalDamage,
-    wasCrit,
+    wasCrit: false,
     hitChance,
     roll,
     debug,
