@@ -7,6 +7,7 @@ import EnemyPanel from "./components/EnemyPanel";
 import Combat from "./modules/Combat";
 import Landing from "./modules/Landing";
 import Shop from "./modules/Shop";
+import WorldMap from "./components/WorldMap";
 import CharacterCreation from "./modules/CharacterCreation";
 import StatTrainer from "./modules/StatTrainer";
 import InventoryScreen from "./components/Inventory";
@@ -37,8 +38,9 @@ export default function App() {
   );
 
   const [mode, setMode] = useState<
-    "creation" | "landing" | "combat" | "shop" | "trainer" | "inventory"
+    "creation" | "landing" | "combat" | "shop" | "trainer" | "inventory" | "map"
   >(loadProgress() ? "landing" : "creation");
+
 
   const saveAndSetPlayer: React.Dispatch<React.SetStateAction<Player>> = (
     update
@@ -83,6 +85,7 @@ export default function App() {
           onEnterShop={() => setMode("shop")}
           onEnterTrainer={() => setMode("trainer")}
           onEnterInventory={() => setMode("inventory")}
+          onEnterMap={() => setMode("map")}
         />
       )}
 
@@ -119,6 +122,17 @@ export default function App() {
           player={player}
           setPlayer={saveAndSetPlayer}
           onClose={() => setMode("landing")}
+        />
+      )}
+
+      {mode === "map" && (
+        <WorldMap
+          onSelect={(locId) => {
+            if (locId === "forest") enterCombat();
+            else if (locId === "town") setMode("landing");
+            else if (locId === "chapel") enterCombat(); // e.g. Neddicus boss
+          }}
+          onExit={() => setMode("landing")}
         />
       )}
 

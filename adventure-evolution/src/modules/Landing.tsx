@@ -9,6 +9,7 @@ type Props = {
   onEnterShop: () => void;
   onEnterTrainer: () => void;
   onEnterInventory: () => void;
+  onEnterMap: () => void;
 };
 
 export default function Landing({
@@ -18,6 +19,7 @@ export default function Landing({
   onEnterShop,
   onEnterTrainer,
   onEnterInventory,
+  onEnterMap,
 }: Props) {
   const handleHeal = () => {
     const healed = fullHeal(player);
@@ -45,6 +47,9 @@ export default function Landing({
         </button>
         <button className={styles.actionButton} onClick={onEnterInventory}>
           View Inventory
+        </button>
+        <button className={styles.actionButton} onClick={onEnterMap}>
+          🌍 World Map
         </button>
       </div>
     </div>
