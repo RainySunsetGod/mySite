@@ -64,22 +64,28 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
   return (
     <div
       style={{
-        // border: "2px solid red",
         padding: "1rem",
         height: "100%",
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
+        position: "relative",
       }}
     >
-      {/* Toggleable/Fadeable stats */}
+      {/* Stats overlay */}
       <div
         style={{
+          position: "absolute",
+          top: 0,
+          left: isLeft ? 0 : "auto",
+          right: isLeft ? "auto" : 0,
           marginBottom: "1rem",
           opacity: displayStats ? (showStats ? 1 : 0.8) : 0,
           transition: "opacity 0.6s ease",
-          pointerEvents: displayStats ? "auto" : "none",
+          pointerEvents: displayStats ? "auto" : "none", // ✅ only block when visible
           textAlign: "left",
+          zIndex: 10,
+          padding: "0.75rem 1rem",
         }}
       >
         <div style={{ marginBottom: "0.5rem" }}>
@@ -153,7 +159,7 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
         )}
       </div>
 
-      {/* Portrait + Bars */}
+      {/* HUD (portrait + bars, always visible) */}
       <div
         style={{
           display: "flex",
@@ -162,6 +168,9 @@ export default function CharacterPanel({ entity, portraitUrl, side }: Props) {
           flexDirection: isLeft ? "row" : "row-reverse",
           gap: "1rem",
           marginTop: "auto",
+          pointerEvents: "auto", // ✅ HUD always interactive
+          position: "relative",
+          zIndex: 5, // below stats overlay
         }}
       >
         {/* Portrait */}

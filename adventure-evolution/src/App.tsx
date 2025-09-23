@@ -138,12 +138,12 @@ export default function App() {
 
       {/* Overlay Panels */}
       {mode !== "creation" && (
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0 }}>
+        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, pointerEvents: "none", }}>
           <PlayerPanel player={player} />
         </div>
       )}
       {mode === "combat" && (
-        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0 }}>
+        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, pointerEvents: "none", }}>
           <EnemyPanel enemy={enemy} />
         </div>
       )}
