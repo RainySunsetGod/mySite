@@ -9,7 +9,7 @@ import styles from "./ActionMenu.module.css";
 type Props = {
   player: Player;
   top8: Record<ContentType, ContentItem[]>;
-  onUse: (item: { id: string; name: string }) => void;
+  onUse: (item: ContentItem) => void;
   onEquip: (updated: Player) => void;
   runCost?: number;
   equippedArmorId?: string;
@@ -34,7 +34,21 @@ export default function ActionMenu({
   const armorItem = equippedArmorId ? getContent(equippedArmorId) : null;
   const armorSkills: Skill[] = armorItem?.skills ?? [];
 
-  const MENU_LABELS: Record<ContentType, string> = {
+  // ✅ Pseudo-items for special actions
+  const BASIC_ATTACK: ContentItem = {
+    id: "attack-basic",
+    name: "Attack",
+    type: "Misc",
+  };
+
+  const RUN_ACTION: ContentItem = {
+    id: "run",
+    name: "Run",
+    type: "Misc",
+  };
+
+  // ✅ MENU_LABELS excludes "Skill"
+  const MENU_LABELS: Record<Exclude<ContentType, "Skill">, string> = {
     Spell: "Spells",
     Weapon: "Weapons",
     Armor: "Armor",
@@ -50,15 +64,16 @@ export default function ActionMenu({
         {/* Attack */}
         <button
           className={styles.actionButton}
-          onClick={() => onUse({ id: "attack-basic", name: "Attack" })}
+          onClick={() => onUse(BASIC_ATTACK)}
         >
           Attack
         </button>
 
-        {/* Skills */}
+        {/* Skills (special case: from armor, not top8) */}
         <div style={{ position: "relative", display: "flex" }}>
           <button
-            className={`${styles.actionButton} ${armorSkills.length === 0 ? styles.disabledButton : ""}`}
+            className={`${styles.actionButton} ${armorSkills.length === 0 ? styles.disabledButton : ""
+              }`}
             disabled={armorSkills.length === 0}
             onClick={() => armorSkills.length > 0 && toggleMenu("Skills")}
           >
@@ -70,7 +85,12 @@ export default function ActionMenu({
                 <button
                   key={skill.id}
                   className={styles.subButton}
-                  onClick={() => onUse(skill)}
+                  onClick={() =>
+                    onUse({
+                      ...skill,
+                      type: "Skill", // ✅ inject missing type so it matches ContentItem
+                    } as ContentItem)
+                  }
                 >
                   {skill.name}
                 </button>
@@ -79,8 +99,8 @@ export default function ActionMenu({
           )}
         </div>
 
-        {/* Gear categories */}
-        {(Object.entries(MENU_LABELS) as [ContentType, string][]).map(
+        {/* Gear categories (all other types from top8) */}
+        {(Object.entries(MENU_LABELS) as [Exclude<ContentType, "Skill">, string][]).map(
           ([type, label]) => (
             <div key={label} style={{ position: "relative", display: "flex" }}>
               <button
@@ -93,31 +113,44 @@ export default function ActionMenu({
               <div
                 className={styles.dropdownContainer}
                 style={{
-                  transform: activeMenu === label ? "translateX(0)" : "translateX(-10px)",
+                  transform:
+                    activeMenu === label ? "translateX(0)" : "translateX(-10px)",
                   opacity: activeMenu === label ? 1 : 0,
                   pointerEvents: activeMenu === label ? "auto" : "none",
                 }}
               >
-                {top8[type].length === 0 && (
-                  <div style={{ color: "#ddd", fontSize: "0.9rem", padding: "0.25rem 0.4rem" }}>
+                {(top8[type] ?? []).length === 0 && (
+                  <div
+                    style={{
+                      color: "#ddd",
+                      fontSize: "0.9rem",
+                      padding: "0.25rem 0.4rem",
+                    }}
+                  >
                     Empty
                   </div>
                 )}
 
-                {top8[type].map((item) => {
+                {(top8[type] ?? []).map((item) => {
                   const isEquippable =
-                    type === "Weapon" || type === "Armor" || type === "Shield" || type === "Pet";
+                    type === "Weapon" ||
+                    type === "Armor" ||
+                    type === "Shield" ||
+                    type === "Pet";
 
                   const isEquipped =
-                    (type === "Weapon" && player.gearView.Weapons[0] === item.id) ||
+                    (type === "Weapon" &&
+                      player.gearView.Weapons[0] === item.id) ||
                     (type === "Armor" && player.gearView.Armor[0] === item.id) ||
-                    (type === "Shield" && player.gearView.Shields[0] === item.id) ||
+                    (type === "Shield" &&
+                      player.gearView.Shields[0] === item.id) ||
                     (type === "Pet" && player.gearView.Pet[0] === item.id);
 
                   return (
                     <button
                       key={item.id}
-                      className={`${styles.subButton} ${isEquipped ? styles.equipped : ""}`}
+                      className={`${styles.subButton} ${isEquipped ? styles.equipped : ""
+                        }`}
                       onMouseEnter={() => setHoveredItem(item)}
                       onMouseLeave={() => setHoveredItem(null)}
                       onClick={() => {
@@ -140,14 +173,17 @@ export default function ActionMenu({
 
         {/* Run */}
         <div style={{ position: "relative", display: "flex" }}>
-          <button className={styles.actionButton} onClick={() => toggleMenu("Run")}>
+          <button
+            className={styles.actionButton}
+            onClick={() => toggleMenu("Run")}
+          >
             Run
           </button>
           {activeMenu === "Run" && (
             <div className={styles.dropdownContainer}>
               <button
                 className={styles.subButton}
-                onClick={() => onUse({ id: "run", name: "Run" })}
+                onClick={() => onUse(RUN_ACTION)}
               >
                 Confirm Run {runCost ? `(Cost: ${runCost} SP)` : ""}
               </button>
@@ -156,7 +192,7 @@ export default function ActionMenu({
         </div>
       </div>
 
-      {/* Hover Preview Panel (kept inline for positioning flexibility) */}
+      {/* Hover Preview Panel */}
       {hoveredItem && (
         <div
           style={{

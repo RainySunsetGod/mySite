@@ -1,3 +1,4 @@
+// src/modules/Combat.tsx
 import { useState } from "react";
 import type { Player } from "../state/player";
 import type { CombatEnemy } from "../data/enemies/types";
@@ -109,7 +110,7 @@ export default function Combat({
       {
         stats: player.stats,
         level: player.level,
-        weapon: playerWeapon ?? undefined,
+        source: playerWeapon ?? undefined,
       },
       {
         stats: enemy.stats,
@@ -174,6 +175,7 @@ export default function Combat({
       {
         stats: enemy.stats,
         level: enemy.level,
+        source: undefined,
       },
       {
         stats: player.stats,
@@ -252,7 +254,6 @@ export default function Combat({
               <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>{popup.value}</div>
             </>
           )}
-
         </div>
       ))}
 
@@ -262,12 +263,70 @@ export default function Combat({
           runCost={runCost}
           top8={top8}
           equippedArmorId={player.gearView.Armor[0] ?? null}
-          onEquip={(updated) => setPlayer(updated)}
-          onUse={(item) => {
+          onEquip={(updated: Player) => setPlayer(updated)}
+          onUse={(item: ContentItem) => {
             if (item.id === "attack-basic") {
               playerAttack();
             } else if (item.id === "run") {
               handleRun();
+            } else if (item.type === "Spell") {
+              if (player.currentMp < (item.cost ?? 0)) {
+                showPopup("player", 0, "No MP");
+                return;
+              }
+
+              // Deduct MP first
+              setPlayer((prev) => ({
+                ...prev,
+                currentMp: prev.currentMp - (item.cost ?? 0),
+              }));
+
+              const outcome = calculateDamageOutcome(
+                {
+                  stats: player.stats,
+                  level: player.level,
+                  source: item, // spell as source
+                },
+                {
+                  stats: enemy.stats,
+                  level: enemy.level,
+                  resistances: enemy.resistances,
+                },
+                "magic",
+                item.element
+              );
+
+              if (!outcome.hit) {
+                showPopup("enemy", undefined, "Miss", item.element, false, true);
+              } else {
+                setEnemy((prev) => ({
+                  ...prev,
+                  currentHp: Math.max(0, prev.currentHp - outcome.damage),
+                }));
+
+                showPopup("enemy", outcome.damage, "Spell", item.element, outcome.wasCrit);
+
+                if (enemy.currentHp - outcome.damage <= 0) {
+                  const goldReward = enemy.gold ?? 0;
+                  const xpReward = enemy.experience ?? 0;
+
+                  setPlayer((p) => {
+                    const updated = {
+                      ...p,
+                      gold: p.gold + goldReward,
+                      experience: p.experience + xpReward,
+                    };
+                    return checkLevelUp(updated);
+                  });
+
+                  setBattleOver(true);
+                  setBattleResult("win");
+                  return;
+                }
+              }
+
+              setTurn("enemy");
+              setTimeout(enemyTurn, 1000);
             }
           }}
         />

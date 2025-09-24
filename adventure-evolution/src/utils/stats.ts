@@ -73,7 +73,7 @@ function getResistanceByType(type: AttackType, stats: CoreStats): number {
 }
 
 export function calculateDamageOutcome(
-  attacker: { stats: CoreStats; level: number; weapon?: ContentItem },
+  attacker: { stats: CoreStats; level: number; source?: ContentItem },
   defender: { stats: CoreStats; level: number; resistances?: Partial<Record<Element, number>> },
   type: AttackType,
   element?: Element
@@ -85,21 +85,28 @@ export function calculateDamageOutcome(
   roll: number;
   debug: string[];
 } {
-  const { stats: atkStats, level: atkLevel, weapon } = attacker;
+  const { stats: atkStats, level: atkLevel, source } = attacker;
   const { stats: defStats, level: defLevel, resistances } = defender;
 
   const debug: string[] = [];
-
   let baseDamage = 0;
 
-  if (weapon?.damage) {
+  if (source?.type === "Weapon" && source.damage) {
     // Weapon with min–max
-    const min = weapon.damage.min;
-    const max = weapon.damage.max;
+    const min = source.damage.min;
+    const max = source.damage.max;
     baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
     debug.push(`Rolled weapon damage: ${baseDamage} (${min}-${max})`);
+  } else if (source?.type === "Spell" && source.power !== undefined) {
+    // Spell with random base power + INT scaling
+    const min = Math.floor(source.power * 0.8 + atkStats.INT * 0.5);
+    const max = Math.floor(source.power * 1.2 + atkStats.INT * 0.8);
+    baseDamage = Math.floor(Math.random() * (max - min + 1)) + min;
+    debug.push(
+      `Spell damage roll: ${baseDamage} (range ${min}-${max}, base power ${source.power}, INT ${atkStats.INT})`
+    );
   } else {
-    // Stat-based "default" attack → generate min–max range
+    // Stat-based fallback
     let min = 0;
     let max = 0;
 
@@ -122,50 +129,37 @@ export function calculateDamageOutcome(
     debug.push(`Stat-based damage roll: ${baseDamage} (${min}-${max})`);
   }
 
-  let critChance = 10 + atkStats.LUK * 0.5 + atkStats.DEX * 0.2; // base + stats
-  if (weapon?.critBonus !== undefined) {
-    critChance += weapon.critBonus;
-    debug.push(`Weapon crit bonus applied: +${weapon.critBonus}`);
+  // Crit chance
+  let critChance = 10 + atkStats.LUK * 0.5 + atkStats.DEX * 0.2;
+  if (source?.critBonus !== undefined) {
+    critChance += source.critBonus;
+    debug.push(`Crit bonus applied: +${source.critBonus}`);
   }
 
   const critRoll = Math.random() * 100;
   const wasCrit = critRoll < critChance;
 
   if (wasCrit) {
-    const critDamage = Math.floor(baseDamage * 2); // AQ = double damage
-    debug.push(
-      `Critical hit! Auto-hit. Roll: ${critRoll.toFixed(1)} < ${critChance.toFixed(1)}`
-    );
+    let finalDamage = Math.floor(baseDamage * 2);
+    debug.push(`Critical hit! Roll: ${critRoll.toFixed(1)} < ${critChance.toFixed(1)}`);
 
-    let finalDamage = critDamage;
-
-    // Apply Elemental Resistance
+    // Apply resistances
     if (element && resistances) {
       const res = resistances[element] ?? 100;
       const adjusted = Math.floor((finalDamage * res) / 100);
-      debug.push(
-        `Elemental check: ${element}, resistance ${res}%. Damage adjusted from ${finalDamage} → ${adjusted}`
-      );
+      debug.push(`Elemental check: ${element}, res ${res}%. Damage ${finalDamage} → ${adjusted}`);
       finalDamage = Math.max(1, adjusted);
     }
 
-    return {
-      hit: true,
-      damage: finalDamage,
-      wasCrit: true,
-      hitChance: 100, // crits always hit
-      roll: critRoll,
-      debug,
-    };
+    return { hit: true, damage: finalDamage, wasCrit: true, hitChance: 100, roll: critRoll, debug };
   }
 
-  // === Accuracy Check (only for non-crits) ===
+  // Accuracy
   const mainStat = getMainStatForType(type, atkStats);
   let accuracy = mainStat * 2 + atkStats.LUK + atkLevel;
-
-  if (weapon?.accuracy !== undefined) {
-    accuracy += weapon.accuracy;
-    debug.push(`Weapon accuracy bonus applied: +${weapon.accuracy}`);
+  if (source?.accuracy !== undefined) {
+    accuracy += source.accuracy;
+    debug.push(`Accuracy bonus applied: +${source.accuracy}`);
   }
 
   const defenseStat = getResistanceByType(type, defStats);
@@ -175,39 +169,19 @@ export function calculateDamageOutcome(
   const roll = Math.random() * 100;
   const hit = roll <= hitChance;
 
-  debug.push(`Final hit chance: ${hitChance.toFixed(1)}%, roll: ${roll.toFixed(1)}`);
-
   if (!hit) {
-    return {
-      hit: false,
-      damage: 0,
-      wasCrit: false,
-      hitChance,
-      roll,
-      debug,
-    };
+    return { hit: false, damage: 0, wasCrit: false, hitChance, roll, debug };
   }
 
-  // === Apply Elemental Resistance ===
+  // Apply resistance
   let finalDamage = Math.max(1, Math.round(baseDamage));
-
   if (element && resistances) {
     const res = resistances[element] ?? 100;
     const adjusted = Math.floor((finalDamage * res) / 100);
-    debug.push(
-      `Elemental check: ${element}, resistance ${res}%. Damage adjusted from ${finalDamage} → ${adjusted}`
-    );
+    debug.push(`Elemental check: ${element}, res ${res}%. Damage ${finalDamage} → ${adjusted}`);
     finalDamage = Math.max(1, adjusted);
   }
 
-  debug.push(`Final damage dealt: ${finalDamage}`);
-
-  return {
-    hit: true,
-    damage: finalDamage,
-    wasCrit: false,
-    hitChance,
-    roll,
-    debug,
-  };
+  debug.push(`Final damage: ${finalDamage}`);
+  return { hit: true, damage: finalDamage, wasCrit: false, hitChance, roll, debug };
 }

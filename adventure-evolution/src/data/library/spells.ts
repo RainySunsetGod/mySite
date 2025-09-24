@@ -7,6 +7,7 @@ export const SPELLS: ContentItem[] = [
     type: "Spell",
     power: 15,
     cost: 5,
+    element: "Fire",
     description: "Hurl a blazing fireball.",
     evolution: {
       requirements: [{ type: "usage", uses: 30 }],

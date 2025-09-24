@@ -1,7 +1,7 @@
 import type { CoreStats } from "../../state/player";
 import type { Element } from "../../modules/elements";
 
-export type ContentType = "Weapon" | "Armor" | "Shield" | "Pet" | "Spell" | "Misc";
+export type ContentType = "Weapon" | "Armor" | "Shield" | "Pet" | "Spell" | "Misc" | "Skill";
 
 export type Skill = {
   id: string;
