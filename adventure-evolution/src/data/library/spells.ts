@@ -6,7 +6,9 @@ export const SPELLS: ContentItem[] = [
     name: "Fireball",
     type: "Spell",
     power: 15,
-    cost: 5,
+    costs: [
+      { type: "MP", amount: 5 }
+    ],
     element: "Fire",
     description: "Hurl a blazing fireball.",
     evolution: {
@@ -19,7 +21,10 @@ export const SPELLS: ContentItem[] = [
     name: "Firestorm",
     type: "Spell",
     power: 35,
-    cost: 12,
+    costs: [
+      { type: "MP", amount: 12 }
+    ],
+    element: "Fire",
     description: "Engulf the battlefield in flames.",
   },
 ];
