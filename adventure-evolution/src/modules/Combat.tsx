@@ -269,30 +269,49 @@ export default function Combat({
               playerAttack();
             } else if (item.id === "run") {
               handleRun();
-            } else if (item.type === "Spell") {
-              if (player.currentMp < (item.cost ?? 0)) {
-                showPopup("player", 0, "No MP");
-                return;
+            } else if (item.type === "Spell" || item.type === "Skill") {
+              const costs = item.costs ?? [];
+
+              // ✅ Check resources
+              for (const c of costs) {
+                if (c.type === "MP" && player.currentMp < c.amount) {
+                  showPopup("player", 0, "No MP");
+                  return;
+                }
+                if (c.type === "SP" && player.currentSp < c.amount) {
+                  showPopup("player", 0, "No SP");
+                  return;
+                }
+                if (c.type === "HP" && player.currentHp <= c.amount) {
+                  showPopup("player", 0, "No HP");
+                  return;
+                }
               }
 
-              // Deduct MP first
-              setPlayer((prev) => ({
-                ...prev,
-                currentMp: prev.currentMp - (item.cost ?? 0),
-              }));
+              // ✅ Deduct resources
+              setPlayer((prev) => {
+                const updated = { ...prev };
+                for (const c of costs) {
+                  if (c.type === "MP") updated.currentMp -= c.amount;
+                  if (c.type === "SP") updated.currentSp -= c.amount;
+                  if (c.type === "HP") updated.currentHp -= c.amount;
+                }
+                return updated;
+              });
 
+              // ✅ Damage calculation
               const outcome = calculateDamageOutcome(
                 {
                   stats: player.stats,
                   level: player.level,
-                  source: item, // spell as source
+                  source: item, // spell/skill itself is the source
                 },
                 {
                   stats: enemy.stats,
                   level: enemy.level,
                   resistances: enemy.resistances,
                 },
-                "magic",
+                item.attackType ?? "magic",
                 item.element
               );
 
@@ -304,7 +323,7 @@ export default function Combat({
                   currentHp: Math.max(0, prev.currentHp - outcome.damage),
                 }));
 
-                showPopup("enemy", outcome.damage, "Spell", item.element, outcome.wasCrit);
+                showPopup("enemy", outcome.damage, item.type, item.element, outcome.wasCrit);
 
                 if (enemy.currentHp - outcome.damage <= 0) {
                   const goldReward = enemy.gold ?? 0;
