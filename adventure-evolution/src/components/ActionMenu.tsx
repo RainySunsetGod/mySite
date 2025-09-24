@@ -35,10 +35,10 @@ export default function ActionMenu({
   const armorSkills: Skill[] = armorItem?.skills ?? [];
 
   const MENU_LABELS: Record<ContentType, string> = {
+    Spell: "Spells",
     Weapon: "Weapons",
     Armor: "Armor",
     Shield: "Shields",
-    Spell: "Spells",
     Pet: "Pet",
     Misc: "Misc",
   };
