@@ -2,26 +2,20 @@ import type { ContentItem } from "./types";
 
 export const PETS: ContentItem[] = [
   {
-    id: "pet_fireling",
-    name: "Fireling",
+    id: "pet_wolf",
+    name: "Wolf Pup",
     type: "Pet",
-    evolution: {
-      requirements: [{ type: "level", level: 5 }],
-      next: "pet_flametail",
-    },
+    damage: { min: 3, max: 6 },
+    element: "Earth",
+    description: "A loyal wolf pup that bites enemies every turn.",
   },
   {
-    id: "pet_flametail",
-    name: "Flametail",
+    id: "pet_fairy",
+    name: "Healing Fairy",
     type: "Pet",
-    evolution: {
-      requirements: [{ type: "level", level: 10 }],
-      next: "pet_infernodon",
-    },
-  },
-  {
-    id: "pet_infernodon",
-    name: "Infernodon",
-    type: "Pet",
+    skills: [
+      { id: "heal-small", name: "Minor Heal", description: "Heals the player slightly." },
+    ],
+    description: "A tiny fairy that heals you during combat.",
   },
 ];

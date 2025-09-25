@@ -9,7 +9,8 @@ export type ContentType =
   | "Pet"
   | "Spell"
   | "Misc"
-  | "Skill";
+  | "Skill"
+  | "Guest";
 
 export type Skill = {
   id: string;
@@ -49,6 +50,8 @@ export type ContentItem = {
     requirements: EvolutionRequirement[];
     next: string;
   };
+
+  special?: string; // e.g. "summon:guest_knight"
 
   resistances?: Partial<Record<Element, number>>; // e.g. { Fire: 90, Ice: 110 }
   damage?: DamageRange;

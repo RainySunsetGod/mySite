@@ -27,4 +27,15 @@ export const SPELLS: ContentItem[] = [
     element: "Fire",
     description: "Engulf the battlefield in flames.",
   },
+  {
+    id: "spell_summon_knight",
+    name: "Summon Knight of Dawn",
+    type: "Spell",
+    costs: [
+      { type: "MP", amount: 20 }
+    ],
+    description: "Summons a Knight of Dawn guest to fight alongside you.",
+    special: "summon:guest_knight"
+  }
+
 ];

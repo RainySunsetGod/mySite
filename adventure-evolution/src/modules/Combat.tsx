@@ -358,23 +358,20 @@ export default function Combat({
           className={styles.returnButton}
           onClick={() => {
             const maxStats = calculateStats(player);
-            let updatedPlayer: Player = player;
-
-            if (battleResult === "loss") {
-              updatedPlayer = {
-                ...player,
-                currentHp: maxStats.hp,
-                currentMp: maxStats.mp,
-                currentSp: 0,
-              };
-            } else if (battleResult === "win") {
-              updatedPlayer = {
-                ...player,
-                currentHp: Math.min(player.currentHp, maxStats.hp),
-                currentMp: Math.min(player.currentMp, maxStats.mp),
-                currentSp: player.currentSp,
-              };
-            }
+            const updatedPlayer: Player =
+              battleResult === "loss"
+                ? {
+                  ...player,
+                  currentHp: maxStats.hp,
+                  currentMp: maxStats.mp,
+                  currentSp: 0,
+                }
+                : {
+                  ...player,
+                  currentHp: Math.min(player.currentHp, maxStats.hp),
+                  currentMp: Math.min(player.currentMp, maxStats.mp),
+                  currentSp: player.currentSp,
+                };
 
             setPlayer(updatedPlayer);
             onExitCombat();
